@@ -57,6 +57,7 @@ class _OMBase:
     """Base class for OpenMath objects"""
 
     kind = None
+    id = None
     parent = None
 
     def toDict(self) -> dict:
@@ -244,9 +245,10 @@ class OMObject(_OMBase):
 
     def toElement(self):
         el = ET.Element(self.kind)
-        el.set("xmlns", self.xmlns) if self.xmlns is not None else None
-        el.set("version", self.version) if self.version is not None else None
-        el.set("cdbase", self.cdbase) if self.cdbase is not None else None
+        el.set("xmlns", self.__dict__.get("xmlns"))
+        el.set("version", self.__dict__.get("version"))
+        el.set("cdbase", self.__dict__.get("cdbase"))
+        el.set("id", self.__dict__.get("id"))
         el.append(self.object.toElement())
         return el
 
@@ -265,6 +267,7 @@ class OMInteger(_OMBase):
 
     def toElement(self):
         el = ET.Element(self.kind)
+        el.set("id", self.__dict__.get("id"))
         el.text = str(self.integer)
         return el
 
@@ -283,6 +286,7 @@ class OMFloat(_OMBase):
 
     def toElement(self):
         el = ET.Element(self.kind)
+        el.set("id", self.__dict__.get("id"))
         el.text = str(self.float)
         return el
 
@@ -301,6 +305,7 @@ class OMString(_OMBase):
 
     def toElement(self):
         el = ET.Element(self.kind)
+        el.set("id", self.__dict__.get("id"))
         el.text = self.string
         return el
 
@@ -319,6 +324,7 @@ class OMBytearray(_OMBase):
 
     def toElement(self):
         el = ET.Element(self.kind)
+        el.set("id", self.__dict__.get("id"))
         el.text = b64encode(self.bytes).decode("ascii")
 
 
@@ -338,6 +344,7 @@ class OMSymbol(_OMBase):
 
     def toElement(self):
         el = ET.Element(self.kind)
+        el.set("id", self.__dict__.get("id"))
         el.set("name", self.name)
         el.set("cd", self.cd)
         if self.cdbase is not None:
@@ -359,6 +366,7 @@ class OMVariable(_OMBase):
 
     def toElement(self):
         el = ET.Element(self.kind)
+        el.set("id", self.__dict__.get("id"))
         el.set("name", self.name)
         return el
 
@@ -389,8 +397,8 @@ class OMApplication(_OMBase):
 
     def toElement(self):
         el = ET.Element(self.kind)
-        if self.cdbase is not None:
-            el.set("cdbase", self.cdbase)
+        el.set("id", self.__dict__.get("id"))
+        el.set("cdbase", self.__dict__.get("cdbase"))
         el.append(self.applicant.toElement())
         for a in self.arguments:
             el.append(a.toElement())
@@ -426,10 +434,10 @@ class OMAttribution(_OMBase):
 
     def toElement(self):
         el = ET.Element(self.kind)
-        if self.cdbase is not None:
-            el.set("cdbase", self.cdbase)
+        el.set("id", self.__dict__.get("id"))
+        el.set("cdbase", self.__dict__.get("cdbase"))
         attrs = ET.Element("OMATP")
-        for [a, b] in self.attributes:
+        for (a, b) in self.attributes:
             attrs.append(a.toElement(), b.toElement())
         el.append(attrs)
         el.append(self.object.toElement())
@@ -473,8 +481,8 @@ class OMBinding(_OMBase):
 
     def toElement(self):
         el = ET.Element(self.kind)
-        if self.cdbase is not None:
-            el.set("cdbase", self.cdbase)
+        el.set("id", self.__dict__.get("id"))
+        el.set("cdbase", self.__dict__.get("cdbase"))
         el.append(self.binder.toElement())
         variables = ET.Element("OMBVAR")
         for v in self.variables:
@@ -509,11 +517,15 @@ class OMError(_OMBase):
 
     def toElement(self):
         el = ET.Element(self.kind)
+        el.set("id", self.__dict__.get("id"))
         el.append(self.error.toElement())
         for a in self.arguments:
             el.append(a.toElement())
         return el
 
+
+class OMReference(_OMBase):
+    pass
 
 def parse(text):
     """Parse either JSON or XML strings into a mathematical object
