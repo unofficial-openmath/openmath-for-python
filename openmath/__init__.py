@@ -237,7 +237,7 @@ class OMObject(_OMBase):
         self.__dict__.update(kwargs)
         setObject(object_)
 
-    def setObject(object_)
+    def setObject(object_):
         _setattrOM(self, "object", object_)
 
     def toElement(self):
@@ -324,7 +324,7 @@ class OMSymbol(_OMBase):
 
     kind = "OMS"
 
-    def __init__(self, name: str, cd: str, cdbase: str|None = None):
+    def __init__(self, name: str, cd: str, cdbase: str | None = None):
         _setattrType(self, "cdbase", cdbase, [str, type(None)])
         _setattrType(self, "cd", cd, str)
         _setattrType(self, "name", name, str)
@@ -363,7 +363,7 @@ class OMApplication(_OMBase):
 
     kind = "OMA"
 
-    def __init__(self, applicant: OMSymbol, arguments, cdbase: str=None):
+    def __init__(self, applicant: OMSymbol, arguments, cdbase: str = None):
         _setattrType(self, "cdbase", cdbase, [str, type(None)])
         setApplicant(applicant)
         setArguments(arguments)
@@ -401,7 +401,7 @@ class OMAttribution(_OMBase):
         _setattrType(self, "cdbase", cdbase, [str, type(None)])
         setObject(object_)
         setAttributes(attributes)
-        
+
     def setObject(object_):
         _setattrOM(self, "object", object_)
 
@@ -414,7 +414,7 @@ class OMAttribution(_OMBase):
             attr[0].parent = self
             attr[1].parent = self
         self.attributes = tuple(attrs)
-    
+
     def toElement(self):
         el = ET.Element(self.kind)
         if self.cdbase is not None:
@@ -446,7 +446,7 @@ class OMBinding(_OMBase):
 
     def setObject(object_):
         _setattrOM(self, "object", object_)
-    
+
     def setBinder(binder):
         _setattrOM(self, "binder", binder)
 
@@ -454,7 +454,10 @@ class OMBinding(_OMBase):
         for v in variables:
             _assertOM(v, ["OMV", "OMATTR"])
             if v.kind == "OMATTR":
-                _valueAssert(v.object.kind == "OMV", "Attributed variable binding must be a variable")
+                _valueAssert(
+                    v.object.kind == "OMV",
+                    "Attributed variable binding must be a variable",
+                )
             v.parent = self
         self.variables = tuple(variables)
 
@@ -483,7 +486,7 @@ class OMError(_OMBase):
     def __init__(self, error, arguments):
         setError(error)
         setArguments(arguments)
-    
+
     def setError(error):
         _setattrOM(self, "error", error, "OMS")
 
@@ -491,7 +494,7 @@ class OMError(_OMBase):
         for arg in arguments:
             _assertOM(arg)
             arg.parent = self
-        self.arguments = tuple(arguments) 
+        self.arguments = tuple(arguments)
 
     def toElement(self):
         el = ET.Element(self.kind)
