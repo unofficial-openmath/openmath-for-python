@@ -5,8 +5,9 @@ work with OpenMath mathematical objects
 """
 import json
 import xml.etree.ElementTree as ET
-from copy import deepcopy
 from xml.dom import minidom
+from copy import deepcopy
+from base64 import b64encode, b64decode
 
 
 def isOM(x, kinds=None):
@@ -157,7 +158,7 @@ class _OMBase:
         "Return a deep copy of the object."
         return deepcopy(self)
 
-    def replace(self, obj1, obj2) -> None:
+    def _replace(self, obj1, obj2) -> None:
         """Replace the instances of an object with another one
 
         Identical instances are replaced, not equivalent ones
@@ -235,9 +236,9 @@ class OMObject(_OMBase):
         self.version = "2.0"
         self.cdbase = None
         self.__dict__.update(kwargs)
-        setObject(object_)
+        self.setObject(object_)
 
-    def setObject(object_):
+    def setObject(self, object_):
         _setattrOM(self, "object", object_)
 
     def toElement(self):
@@ -250,7 +251,7 @@ class OMObject(_OMBase):
 
 
 class OMInteger(_OMBase):
-    """Implementation of the Integer object
+    """Implementation of the OMInteger object
 
     Reference: https://openmath.org/standard/om20-2019-07-01/omstd20.html#sec_basic
     """
@@ -267,7 +268,7 @@ class OMInteger(_OMBase):
 
 
 class OMFloat(_OMBase):
-    """Implementation of the Float object
+    """Implementation of the OMFloat object
 
     Reference: https://openmath.org/standard/om20-2019-07-01/omstd20.html#sec_basic
     """
@@ -284,7 +285,7 @@ class OMFloat(_OMBase):
 
 
 class OMString(_OMBase):
-    """Implementation of the String object
+    """Implementation of the OMString object
 
     Reference: https://openmath.org/standard/om20-2019-07-01/omstd20.html#sec_basic
     """
@@ -301,7 +302,7 @@ class OMString(_OMBase):
 
 
 class OMBytearray(_OMBase):
-    """Implementation of the Bytearray object
+    """Implementation of the OMBytearray object
 
     Reference: https://openmath.org/standard/om20-2019-07-01/omstd20.html#sec_basic
     """
@@ -309,15 +310,14 @@ class OMBytearray(_OMBase):
     kind = "OMB"
 
     def __init__(self, bytes_: list):
-        _assertType(bytes_, list)
-        for x in bytes_:
-            _assertType(x, int)
-            _valueAssert(x >= 0 and x < 256, "byte value too high")
-        self.bytes = bytes_
+        self.bytes = bytes(bytes_)
 
+    def toElement(self):
+        el = ET.Element(self.kind)
+        el.text = b64encode(self.bytes).decode("ascii")
 
 class OMSymbol(_OMBase):
-    """Implementation of the Symbol object
+    """Implementation of the OMSymbol object
 
     Reference: https://openmath.org/standard/om20-2019-07-01/omstd20.html#sec_basic
     """
@@ -339,7 +339,7 @@ class OMSymbol(_OMBase):
 
 
 class OMVariable(_OMBase):
-    """Implementation of the Variable object
+    """Implementation of the OMVariable object
 
     Reference: https://openmath.org/standard/om20-2019-07-01/omstd20.html#sec_basic
     """
@@ -356,7 +356,7 @@ class OMVariable(_OMBase):
 
 
 class OMApplication(_OMBase):
-    """Implementation of the Application object
+    """Implementation of the OMApplication object
 
     Reference: https://openmath.org/standard/om20-2019-07-01/omstd20.html#sec_compound
     """
@@ -365,16 +365,16 @@ class OMApplication(_OMBase):
 
     def __init__(self, applicant: OMSymbol, arguments, cdbase: str = None):
         _setattrType(self, "cdbase", cdbase, [str, type(None)])
-        setApplicant(applicant)
-        setArguments(arguments)
+        self.setApplicant(applicant)
+        self.setArguments(arguments)
 
-    def setApplicant(applicant):
+    def setApplicant(self, applicant):
         # The standard doesn't specify the kind of the applicant
         _setattrOM(self, "applicant", applicant)
 
-    def setArguments(arguments):
+    def setArguments(self, arguments):
         for arg in arguments:
-            _assertOM(arg)
+            assertOM(arg)
             arg.parent = self
         self.arguments = tuple(arguments)
 
@@ -389,7 +389,7 @@ class OMApplication(_OMBase):
 
 
 class OMAttribution(_OMBase):
-    """Implementation of the Attribution object
+    """Implementation of the OMAttribution object
 
     Reference: https://openmath.org/standard/om20-2019-07-01/omstd20.html#sec_compound
     """
@@ -397,20 +397,19 @@ class OMAttribution(_OMBase):
     kind = "OMATTR"
 
     def __init__(self, attributes, object_, cdbase=None):
-        self.cdbase = cdbase_setattrOM
         _setattrType(self, "cdbase", cdbase, [str, type(None)])
-        setObject(object_)
-        setAttributes(attributes)
+        self.setObject(object_)
+        self.setAttributes(attributes)
 
-    def setObject(object_):
+    def setObject(self, object_):
         _setattrOM(self, "object", object_)
 
-    def setAttributes(attrs):
+    def setAttributes(self, attrs):
         for attr in attrs:
             _assertType(attr, tuple)
             _valueAssert(len(attr) == 2, "Attributes must be two values")
-            _assertOM(attr[0], "OMS")
-            _assertOM(attr[1])
+            assertOM(attr[0], "OMS")
+            assertOM(attr[1])
             attr[0].parent = self
             attr[1].parent = self
         self.attributes = tuple(attrs)
@@ -428,7 +427,7 @@ class OMAttribution(_OMBase):
 
 
 class OMBinding(_OMBase):
-    """Implementation of the Binding object
+    """Implementation of the OMBinding object
 
     Reference: https://openmath.org/standard/om20-2019-07-01/omstd20.html#sec_compound
     """
@@ -437,22 +436,22 @@ class OMBinding(_OMBase):
 
     def __init__(self, binder, variables, object_, cdbase=None):
         _setattrType(self, "cdbase", cdbase, [str, type(None)])
-        setObject(object_)
-        setBinder(binder)
-        setVariables(variables)
+        self.setObject(object_)
+        self.setBinder(binder)
+        self.setVariables(variables)
         self.variables = variables
         for v in self.variables:
             v.parent = self
 
-    def setObject(object_):
+    def setObject(self, object_):
         _setattrOM(self, "object", object_)
 
-    def setBinder(binder):
+    def setBinder(self, binder):
         _setattrOM(self, "binder", binder)
 
-    def setVariables(variables):
+    def setVariables(self, variables):
         for v in variables:
-            _assertOM(v, ["OMV", "OMATTR"])
+            assertOM(v, ["OMV", "OMATTR"])
             if v.kind == "OMATTR":
                 _valueAssert(
                     v.object.kind == "OMV",
@@ -476,7 +475,7 @@ class OMBinding(_OMBase):
 
 
 class OMError(_OMBase):
-    """Implementation of the Error object
+    """Implementation of the OMError object
 
     Reference: https://openmath.org/standard/om20-2019-07-01/omstd20.html#sec_compound
     """
@@ -484,15 +483,15 @@ class OMError(_OMBase):
     kind = "OME"
 
     def __init__(self, error, arguments):
-        setError(error)
-        setArguments(arguments)
+        self.setError(error)
+        self.setArguments(arguments)
 
-    def setError(error):
+    def setError(self, error):
         _setattrOM(self, "error", error, "OMS")
 
-    def setArguments(arguments):
+    def setArguments(self, arguments):
         for arg in arguments:
-            _assertOM(arg)
+            assertOM(arg)
             arg.parent = self
         self.arguments = tuple(arguments)
 
@@ -539,7 +538,7 @@ def fromDict(dictionary):
     match (dictionary):
 
         case {"kind": "OMOBJ", **kwargs}:
-            return Object(
+            return OMObject(
                 fromDict(kwargs["object"]),
                 cdbase=kwargs.get("cdbase"),
                 version=kwargs.get("version"),
@@ -547,44 +546,44 @@ def fromDict(dictionary):
             )
 
         case {"kind": "OMI", "integer": x, **kwargs}:
-            return Integer(int(x))
+            return OMInteger(int(x))
 
         case {"kind": "OMI", "decimal": x, **kwargs}:
-            return Integer(int(x))
+            return OMInteger(int(x))
 
         case {"kind": "OMI", "hexadecimal": x, **kwargs}:
-            return Integer(int(x, 16))
+            return OMInteger(int(x, 16))
 
         case {"kind": "OMF", "integer": x, **kwargs}:
-            return Float(float(x))
+            return OMFloat(float(x))
 
         case {"kind": "OMF", "decimal": x, **kwargs}:
-            return Float(float(x))
+            return OMFloat(float(x))
 
         case {"kind": "OMF", "hexadecimal": x, **kwargs}:
-            return Float(float(x, 16))
+            return OMFloat(float(x, 16))
 
         case {"kind": "OMSTR", **kwargs}:
-            return Bytearray(kwargs["string"])
+            return OMBytearray(kwargs["string"])
 
         case {"kind": "OMB", **kwargs}:
-            return Bytearray(kwargs["bytes"])
+            return OMBytearray(kwargs["bytes"])
 
         case {"kind": "OMA", **kwargs}:
-            return Application(
+            return OMApplication(
                 fromDict(kwargs["applicant"]),
-                *[fromDict(a) for a in kwargs.get("arguments", [])],
+                [fromDict(a) for a in kwargs.get("arguments", [])],
                 cdbase=kwargs.get("cdbase")
             )
 
         case {"kind": "OMV", **kwargs}:
-            return Variable(kwargs["name"])
+            return OMVariable(kwargs["name"])
 
         case {"kind": "OMS", **kwargs}:
-            return Symbol(kwargs["name"], kwargs["cd"], cdbase=kwargs.get("cdbase"))
+            return OMSymbol(kwargs["name"], kwargs["cd"], cdbase=kwargs.get("cdbase"))
 
         case {"kind": "OMBIND", **kwargs}:
-            return Binding(
+            return OMBinding(
                 fromDict(kwargs["binder"]),
                 [fromDict(v) for v in kwargs["variables"]],
                 fromDict(kwargs["object"]),
@@ -597,14 +596,14 @@ def fromDict(dictionary):
                 if type(x) is not list
                 else [recFromDict(xx) for xx in x]
             )
-            return Attribution(
+            return OMAttribution(
                 recFromDict(kwargs["attributes"]),
                 fromDict(kwargs["object"]),
                 kwargs.get("cdbase"),
             )
 
         case {"kind": "OME", **kwargs}:
-            return Error(kwargs["error"], kwargs.get("arguments"))
+            return OMError(kwargs["error"], kwargs.get("arguments"))
 
         case _:
             raise ValueError("A valid dictionary is required")
@@ -627,40 +626,40 @@ def fromElement(elem):
 
     match tag:
         case "OMOBJ":
-            return Object(fromElement(elem[0]), **elem.attrib)
+            return OMObject(fromElement(elem[0]), **elem.attrib)
 
         case "OMI":
             if elem.text.strip()[0] == "x":
-                return Integer(int(elem.text.strip()[1:]))
+                return OMInteger(int(elem.text.strip()[1:]))
             elif elem.text.strip()[:2] == "-x":
-                return Integer(-int(elem.text.strip()[2:]))
+                return OMInteger(-int(elem.text.strip()[2:]))
             else:
-                return Integer(int(elem.text.strip()))
+                return OMInteger(int(elem.text.strip()))
 
         case "OMF":
             if "dec" in elem.attrib:
-                return Float(float(elem.attrib["dec"]))
+                return OMFloat(float(elem.attrib["dec"]))
             else:
-                return Float(float(elem.attrib["hex"]))
+                return OMFloat(float(elem.attrib["hex"]))
 
         case "OMS":
-            return Symbol(
+            return OMSymbol(
                 elem.attrib["name"], elem.attrib["cd"], elem.attrib.get("cdbase")
             )
 
         case "OMV":
-            return Variable(elem.attrib["name"])
+            return OMVariable(elem.attrib["name"])
 
         case "OMSTR":
-            return String(elem.text)
+            return OMString(elem.text)
 
         case "OMB":
-            raise NotImplementedError("XML encoded OpenMath Bytearrays")
+            return OMBytearray(b64decode(elem.text))
 
         case "OMA":
-            return Application(
+            return OMApplication(
                 fromElement(elem[0]),
-                *[fromElement(x) for x in elem[1:]],
+                [fromElement(x) for x in elem[1:]],
                 cdbase=elem.attrib.get("cdbase")
             )
 
@@ -677,13 +676,13 @@ def fromElement(elem):
                             key = x
                 else:
                     obj = fromElement(child)
-            return Attribution(attrs, obj, cdbase=elem.attrib.get("cdbase"))
+            return OMAttribution(attrs, obj, cdbase=elem.attrib.get("cdbase"))
 
         case "OME":
-            return Error(fromElement(elem[0]), [fromElement(x) for x in elem[1:]])
+            return OMError(fromElement(elem[0]), [fromElement(x) for x in elem[1:]])
 
         case "OMBIND":
-            return Binding(
+            return OMBinding(
                 fromElement(elem[0]),
                 [fromElement(x) for x in elem.find(qname("OMBVAR"))],
                 fromElement(elem[2]),
