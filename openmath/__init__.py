@@ -230,6 +230,7 @@ class OMObject(_OMBase):
     """
 
     kind = "OMOBJ"
+    __match_args__ = ("object",)
 
     def __init__(self, object_, **kwargs):
         self.xmlns = None
@@ -257,6 +258,7 @@ class OMInteger(_OMBase):
     """
 
     kind = "OMI"
+    __match_args__ = ("integer",)
 
     def __init__(self, integer: int):
         _setattrType(self, "integer", integer, int)
@@ -274,6 +276,7 @@ class OMFloat(_OMBase):
     """
 
     kind = "OMF"
+    __match_args__ = ("float",)
 
     def __init__(self, float_: float):
         _setattrType(self, "float", float_, float)
@@ -291,6 +294,7 @@ class OMString(_OMBase):
     """
 
     kind = "OMSTR"
+    __match_args__ = ("string",)
 
     def __init__(self, string):
         _setattrType(self, "string", string, str)
@@ -308,6 +312,7 @@ class OMBytearray(_OMBase):
     """
 
     kind = "OMB"
+    __match_args__ = ("bytes",)
 
     def __init__(self, bytes_: list):
         self.bytes = bytes(bytes_)
@@ -316,6 +321,7 @@ class OMBytearray(_OMBase):
         el = ET.Element(self.kind)
         el.text = b64encode(self.bytes).decode("ascii")
 
+
 class OMSymbol(_OMBase):
     """Implementation of the OMSymbol object
 
@@ -323,6 +329,7 @@ class OMSymbol(_OMBase):
     """
 
     kind = "OMS"
+    __match_args__ = ("name", "cd")
 
     def __init__(self, name: str, cd: str, cdbase: str | None = None):
         _setattrType(self, "cdbase", cdbase, [str, type(None)])
@@ -345,6 +352,7 @@ class OMVariable(_OMBase):
     """
 
     kind = "OMV"
+    __match_args__ = ("variable",)
 
     def __init__(self, name: str):
         _setattrType(self, "name", name, str)
@@ -362,6 +370,7 @@ class OMApplication(_OMBase):
     """
 
     kind = "OMA"
+    __match_args__ = ("applicant", "arguments")
 
     def __init__(self, applicant: OMSymbol, arguments, cdbase: str = None):
         _setattrType(self, "cdbase", cdbase, [str, type(None)])
@@ -395,6 +404,7 @@ class OMAttribution(_OMBase):
     """
 
     kind = "OMATTR"
+    __match_args__ = ("attributes", "object")
 
     def __init__(self, attributes, object_, cdbase=None):
         _setattrType(self, "cdbase", cdbase, [str, type(None)])
@@ -433,6 +443,7 @@ class OMBinding(_OMBase):
     """
 
     kind = "OMBIND"
+    __match_args__ = ("binder", "variables", "object")
 
     def __init__(self, binder, variables, object_, cdbase=None):
         _setattrType(self, "cdbase", cdbase, [str, type(None)])
@@ -481,6 +492,7 @@ class OMError(_OMBase):
     """
 
     kind = "OME"
+    __match_args__ = ("error", "arguments")
 
     def __init__(self, error, arguments):
         self.setError(error)
