@@ -171,16 +171,18 @@ class _OMBase:
             if obj1 is d[k]:  # depth level 1
                 d[k] = obj2.clone()
                 d[k].parent = self
-            elif type(d[k]) is list:  # depth level 1
-                for i, elem in enumerate(d[k]):
+            elif type(d[k]) is tuple:  # depth level 1
+                attr = list(d[k])
+                for i, elem in enumerate(attr):
                     if obj1 is elem:
-                        d[k][i] = obj2.clone()
-                        d[k][i].parent = self
+                        attr[i] = obj2.clone()
+                        attr[i].parent = self
                     elif type(elem) is tuple:  # depth level 2 (for OMATTR)
                         elem = tuple(
                             obj2.clone() if subelem is obj1 else subelem
                             for subelem in elem
                         )
+                d[k] = tuple(attr)
 
     def __eq__(self, other) -> bool:
         """Return true if all attributes are present and equal in both instances"""
@@ -228,12 +230,15 @@ class OMObject(_OMBase):
 
     kind = "OMOBJ"
 
-    def __init__(self, object, **kwargs):
-        _setattrOM(self, "object", object)
+    def __init__(self, object_, **kwargs):
         self.xmlns = None
         self.version = "2.0"
         self.cdbase = None
         self.__dict__.update(kwargs)
+        setObject(object_)
+
+    def setObject(object_)
+        _setattrOM(self, "object", object_)
 
     def toElement(self):
         el = ET.Element(self.kind)
@@ -358,34 +363,20 @@ class OMApplication(_OMBase):
 
     kind = "OMA"
 
-    def __init__(self, applicant: OMSymbol, arguments: list, cdbase: str=None):
+    def __init__(self, applicant: OMSymbol, arguments, cdbase: str=None):
         _setattrType(self, "cdbase", cdbase, [str, type(None)])
+        setApplicant(applicant)
+        setArguments(arguments)
+
+    def setApplicant(applicant):
         # The standard doesn't specify the kind of the applicant
         _setattrOM(self, "applicant", applicant)
-        _assertType(arguments, list)
+
+    def setArguments(arguments):
         for arg in arguments:
-            assertOM(arg)
-
-        self.arguments = arguments
-        for a in self.arguments:
-            a.parent = self
-        
-    def insertArg(index, arg):
-        _assertOM(arg)
-        arg.parent = self
-        self.arguments.insert(index, arg)
-
-    def appendArg(arg):
-        _assertOM(arg)
-        arg.parent = self
-        self.arguments.append(arg)
-
-    def isValid(self):
-        return (
-            self.hasValidCDBase()
-            and self.applicant.isValid()
-            and all(a.isValid() for a in self.arguments)
-        )
+            _assertOM(arg)
+            arg.parent = self
+        self.arguments = tuple(arguments)
 
     def toElement(self):
         el = ET.Element(self.kind)
@@ -405,25 +396,25 @@ class OMAttribution(_OMBase):
 
     kind = "OMATTR"
 
-    def __init__(self, attributes, object, cdbase=None):
-        self.cdbase = attributes
-        self.attributes = attributes
-        for pair in self.attributes:
-            for elem in pair:
-                elem.parent = self
-        self.object = object
-        object.parent = self
+    def __init__(self, attributes, object_, cdbase=None):
+        self.cdbase = cdbase_setattrOM
+        _setattrType(self, "cdbase", cdbase, [str, type(None)])
+        setObject(object_)
+        setAttributes(attributes)
+        
+    def setObject(object_):
+        _setattrOM(self, "object", object_)
 
-    def isValid(self):
-        return (
-            self.hasValidCDBase()
-            and self.object.isValid()
-            and all(
-                isinstance(a, Symbol) and a.isValid() and b.isValid()
-                for [a, b] in attributes
-            )
-        )
-
+    def setAttributes(attrs):
+        for attr in attrs:
+            _assertType(attr, tuple)
+            _valueAssert(len(attr) == 2, "Attributes must be two values")
+            _assertOM(attr[0], "OMS")
+            _assertOM(attr[1])
+            attr[0].parent = self
+            attr[1].parent = self
+        self.attributes = tuple(attrs)
+    
     def toElement(self):
         el = ET.Element(self.kind)
         if self.cdbase is not None:
@@ -444,27 +435,28 @@ class OMBinding(_OMBase):
 
     kind = "OMBIND"
 
-    def __init__(self, binder, variables, object, cdbase=None):
-        self.cdbase = cdbase
-        self.binder = binder
+    def __init__(self, binder, variables, object_, cdbase=None):
+        _setattrType(self, "cdbase", cdbase, [str, type(None)])
+        setObject(object_)
+        setBinder(binder)
+        setVariables(variables)
         self.variables = variables
-        self.object = object
-        binder.parent = self
         for v in self.variables:
             v.parent = self
-        object.parent = self
 
-    def isValid(self):
-        if len(self.variables) == 0 or (
-            self.cdbase is not None and type(self.cdbase) is not str
-        ):
-            return False
-        for v in self.variables:
-            isVariable = type(v) is Variable
-            isAttributedVariable = type(v) is Attribution and type(v.object) is Variable
-            if not isVariable and not isAttributedVariable:
-                return False
-        return self.hasValidCDBase()
+    def setObject(object_):
+        _setattrOM(self, "object", object_)
+    
+    def setBinder(binder):
+        _setattrOM(self, "binder", binder)
+
+    def setVariables(variables):
+        for v in variables:
+            _assertOM(v, ["OMV", "OMATTR"])
+            if v.kind == "OMATTR":
+                _valueAssert(v.object.kind == "OMV", "Attributed variable binding must be a variable")
+            v.parent = self
+        self.variables = tuple(variables)
 
     def toElement(self):
         el = ET.Element(self.kind)
@@ -489,14 +481,17 @@ class OMError(_OMBase):
     kind = "OME"
 
     def __init__(self, error, arguments):
-        self.error = error
-        error.parent = self
-        self.arguments = arguments
-        for a in arguments:
-            a.parent = self
+        setError(error)
+        setArguments(arguments)
+    
+    def setError(error):
+        _setattrOM(self, "error", error, "OMS")
 
-    def isValid(self):
-        return type(self.error) is Symbol
+    def setArguments(arguments):
+        for arg in arguments:
+            _assertOM(arg)
+            arg.parent = self
+        self.arguments = tuple(arguments) 
 
     def toElement(self):
         el = ET.Element(self.kind)
