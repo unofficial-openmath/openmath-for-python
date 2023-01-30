@@ -10,15 +10,18 @@ from xml.dom import minidom
 from copy import deepcopy
 from base64 import b64encode, b64decode
 
+
 class _OMFound(BaseException):
     def __init__(self, object_):
         self.object = object_
 
+
 def _removeNoneAttrib(elem):
     """Remove None attributes from XML tree"""
-    elem.attrib = {k:elem.attrib[k] for k in elem.attrib if elem.attrib[k] is not None}
+    elem.attrib = {k: elem.attrib[k] for k in elem.attrib if elem.attrib[k] is not None}
     for subelem in elem:
         _removeNoneAttrib(subelem)
+
 
 def _assertType(x, types):
     if not isinstance(x, types):
@@ -174,18 +177,17 @@ class _OMBase:
 
     def getByID(self, id):
         """Get an object by its ID"""
-        
+
         def checkID(object_):
             if object_.id == id:
                 raise _OMFound(object_)
-        
+
         try:
             self.apply(checkID)
         except _OMFound as e:
             return e.object
-        
-        return None
 
+        return None
 
     def clone(self):
         "Return a deep copy of the object."
@@ -295,7 +297,7 @@ class OMInteger(_OMBase):
     kind = "OMI"
     __match_args__ = ("integer",)
 
-    def __init__(self, integer: int, id = None):
+    def __init__(self, integer: int, id=None):
         _setattrType(self, "id", id, (str, type(None)))
         _setattrType(self, "integer", integer, int)
 
@@ -315,7 +317,7 @@ class OMFloat(_OMBase):
     kind = "OMF"
     __match_args__ = ("float",)
 
-    def __init__(self, float_: float, id = None):
+    def __init__(self, float_: float, id=None):
         _setattrType(self, "id", id, (str, type(None)))
         _setattrType(self, "float", float_, float)
 
@@ -335,7 +337,7 @@ class OMString(_OMBase):
     kind = "OMSTR"
     __match_args__ = ("string",)
 
-    def __init__(self, string, id = None):
+    def __init__(self, string, id=None):
         _setattrType(self, "id", id, (str, type(None)))
         _setattrType(self, "string", string, str)
 
@@ -355,7 +357,7 @@ class OMBytearray(_OMBase):
     kind = "OMB"
     __match_args__ = ("bytes",)
 
-    def __init__(self, bytes_: list, id = None):
+    def __init__(self, bytes_: list, id=None):
         _setattrType(self, "id", id, (str, type(None)))
         self.bytes = bytes(bytes_)
 
@@ -374,7 +376,7 @@ class OMSymbol(_OMBase):
     kind = "OMS"
     __match_args__ = ("name", "cd")
 
-    def __init__(self, name: str, cd: str, cdbase = None, id = None):
+    def __init__(self, name: str, cd: str, cdbase=None, id=None):
         _setattrType(self, "id", id, (str, type(None)))
         _setattrType(self, "cdbase", cdbase, (str, type(None)))
         _setattrType(self, "cd", cd, str)
@@ -399,7 +401,7 @@ class OMVariable(_OMBase):
     kind = "OMV"
     __match_args__ = ("variable",)
 
-    def __init__(self, name: str, id = None):
+    def __init__(self, name: str, id=None):
         _setattrType(self, "id", id, (str, type(None)))
         _setattrType(self, "name", name, str)
 
@@ -419,7 +421,7 @@ class OMApplication(_OMBase):
     kind = "OMA"
     __match_args__ = ("applicant", "arguments")
 
-    def __init__(self, applicant: OMSymbol, arguments, cdbase: str = None, id = None):
+    def __init__(self, applicant: OMSymbol, arguments, cdbase: str = None, id=None):
         _setattrType(self, "id", id, (str, type(None)))
         _setattrType(self, "cdbase", cdbase, (str, type(None)))
         self.setApplicant(applicant)
@@ -454,7 +456,7 @@ class OMAttribution(_OMBase):
     kind = "OMATTR"
     __match_args__ = ("attributes", "object")
 
-    def __init__(self, attributes, object_, cdbase=None, id = None):
+    def __init__(self, attributes, object_, cdbase=None, id=None):
         _setattrType(self, "id", id, (str, type(None)))
         _setattrType(self, "cdbase", cdbase, (str, type(None)))
         self.setObject(object_)
@@ -494,7 +496,7 @@ class OMBinding(_OMBase):
     kind = "OMBIND"
     __match_args__ = ("binder", "variables", "object")
 
-    def __init__(self, binder, variables, object_, cdbase=None, id = None):
+    def __init__(self, binder, variables, object_, cdbase=None, id=None):
         _setattrType(self, "id", id, (str, type(None)))
         _setattrType(self, "cdbase", cdbase, (str, type(None)))
         self.setObject(object_)
@@ -544,7 +546,7 @@ class OMError(_OMBase):
     kind = "OME"
     __match_args__ = ("error", "arguments")
 
-    def __init__(self, error, arguments, id = None):
+    def __init__(self, error, arguments, id=None):
         _setattrType(self, "id", id, (str, type(None)))
         self.setError(error)
         self.setArguments(arguments)
@@ -575,10 +577,10 @@ class OMReference(_OMBase):
 
     kind = "OMR"
 
-    def __init__(self, href, id = None):
+    def __init__(self, href, id=None):
         _setattrType(self, "id", id, (str, type(None)))
         _setattrType(self, "href", href, str)
-    
+
     def resolve(self):
         # Decompose URI into URL and ID
         target = None
@@ -587,21 +589,23 @@ class OMReference(_OMBase):
         id = uri[1] if len(uri) == 2 else None
 
         # Get the whole mathematical object first
-        if url == "": # relative reference
+        if url == "":  # relative reference
             target = self.getRoot()
             if target is None:
                 raise RuntimeError("Could not resolve " + self.href)
-        
-        else: # external reference
+
+        else:  # external reference
             objectStr = None
 
-            if url.startswith("http"): # remote reference
+            if url.startswith("http"):  # remote reference
                 response = requests.get(url)
                 if not response:
-                    raise RuntimeError("Could not resolve %s (%s)" % (self.href), response)
+                    raise RuntimeError(
+                        "Could not resolve %s (%s)" % (self.href), response
+                    )
                 objectStr = response.text
 
-            else: # local reference
+            else:  # local reference
                 try:
                     with open(url, "r") as fh:
                         objectStr = fh.read()
@@ -625,8 +629,8 @@ class OMReference(_OMBase):
         if self.parent is not None:
             self.parent._replace(self, target)
 
-        return target        
-    
+        return target
+
     def toElement(self):
         el = ET.Element(self.kind)
         el.set("href", self.href)
@@ -703,7 +707,7 @@ def fromDict(dictionary):
             return OMApplication(
                 fromDict(kwargs["applicant"]),
                 [fromDict(a) for a in kwargs.get("arguments", [])],
-                cdbase=kwargs.get("cdbase")
+                cdbase=kwargs.get("cdbase"),
             )
 
         case {"kind": "OMV", **kwargs}:
@@ -790,7 +794,7 @@ def fromElement(elem):
             return OMApplication(
                 fromElement(elem[0]),
                 [fromElement(x) for x in elem[1:]],
-                cdbase=elem.attrib.get("cdbase")
+                cdbase=elem.attrib.get("cdbase"),
             )
 
         case "OMATTR":
@@ -820,6 +824,7 @@ def fromElement(elem):
 
         case _:
             raise ValueError("A valid ElementTree is required: %s" % elem)
+
 
 omr = OMObject(OMReference("../openmath/om/cos_0.om"))
 print(omr.toXML())
