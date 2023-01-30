@@ -129,13 +129,3 @@ def fromTree(tree):
         cd.definitions.append(symboldef)
 
     return cd
-
-
-tree = ET.parse("arith1.cd")
-cd = fromTree(tree)
-print(cd[1].description)
-print([x.description for x in cd if x.name == "minus"])
-print("sum" in cd)
-print(om.OMSymbol("sum", "arith1", cdbase=CDBASEOFFICIAL) in cd)
-print(om.OMSymbol("productt", "arith1", cdbase=CDBASEOFFICIAL) in cd)
-print(cd.symbol("unary_minus", alsobase=True))
