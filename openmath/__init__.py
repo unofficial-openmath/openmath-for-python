@@ -190,8 +190,26 @@ class _OMBase:
         return None
 
     def clone(self):
-        "Return a deep copy of the object."
+        """Return a deep copy of the object."""
         return deepcopy(self)
+
+    def dereference(self, derefStack = None):
+        """Resolve all references in the object"""
+        if derefStack is None:
+            derefStack = []
+        
+        def singleDereference(object_):
+            if object_.kind != "OMR":
+                return
+            href = object_.href
+            if href in derefStack:
+                raise RuntimeError("Cycle reference: " + " > ".join(derefStack) + " > " + href)
+            target = object_.resolve()
+            derefStack.append(href)
+            target.dereference(derefStack)
+            derefStack.pop()
+        
+        self.apply(singleDereference)
 
     def _replace(self, obj1, obj2) -> None:
         """Replace the instances of an object with another one
@@ -827,6 +845,9 @@ def fromElement(elem):
 
 
 omr = OMObject(OMReference("../openmath/om/cos_0.om"))
-print(omr.toXML())
-om = omr.object.resolve()
-print(om.toXML(indent=2))
+
+
+
+omr.dereference()
+
+print(omr.toXML(indent=2))
