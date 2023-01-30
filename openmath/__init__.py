@@ -152,7 +152,7 @@ class _OMBase:
             if isOM(value):  # level of depth 0
                 value.apply(f, accumulator)
 
-            elif type(value) is list:  # level of depth 1
+            elif type(value) is tuple:  # level of depth 1
                 for subval in value:
                     if isOM(subval):
                         subval.apply(f, accumulator)
