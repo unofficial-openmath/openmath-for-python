@@ -193,22 +193,24 @@ class _OMBase:
         """Return a deep copy of the object."""
         return deepcopy(self)
 
-    def dereference(self, derefStack = None):
+    def dereference(self, derefStack=None):
         """Resolve all references in the object"""
         if derefStack is None:
             derefStack = []
-        
+
         def singleDereference(object_):
             if object_.kind != "OMR":
                 return
             href = object_.href
             if href in derefStack:
-                raise RuntimeError("Cycle reference: " + " > ".join(derefStack) + " > " + href)
+                raise RuntimeError(
+                    "Cycle reference: " + " > ".join(derefStack) + " > " + href
+                )
             target = object_.resolve()
             derefStack.append(href)
             target.dereference(derefStack)
             derefStack.pop()
-        
+
         self.apply(singleDereference)
 
     def _replace(self, obj1, obj2) -> None:
@@ -589,18 +591,18 @@ class OMError(_OMBase):
 
 class OMForeign(_OMBase):
     """Implementation of OMFOREIGN objects
-    
+
     Reference: https://openmath.org/standard/om20-2019-07-01/omstd20.html#sec_json-omforeign---foreign-objects
     """
 
     kind = "OMFOREIGN"
     __match_args__ = ("foreign", "encoding")
-    
+
     def __init__(self, foreign, encoding=None, id=None):
         _setattrType(self, "id", id, (str, type(None)))
         _setattrType(self, "encoding", encoding, (str, type(None)))
         _valueAssert(foreign is not None, "Foreign object can't be None")
-    
+
     def toElement(self):
         el = ET.Element(self.kind)
         el.set("id", self.__dict__.get("id"))
@@ -723,44 +725,51 @@ def fromDict(dictionary):
                 cdbase=kwargs.get("cdbase"),
                 version=kwargs.get("version"),
                 xmlns=kwargs.get("xmlns"),
+                **kwargs
             )
 
         case {"kind": "OMI", "integer": x, **kwargs}:
-            return OMInteger(int(x))
+            return OMInteger(int(x), id=kwargs.get("id"))
 
         case {"kind": "OMI", "decimal": x, **kwargs}:
-            return OMInteger(int(x))
+            return OMInteger(int(x), id=kwargs.get("id"))
 
         case {"kind": "OMI", "hexadecimal": x, **kwargs}:
-            return OMInteger(int(x, 16))
+            return OMInteger(int(x, 16), id=kwargs.get("id"))
 
         case {"kind": "OMF", "integer": x, **kwargs}:
-            return OMFloat(float(x))
+            return OMFloat(float(x), id=kwargs.get("id"))
 
         case {"kind": "OMF", "decimal": x, **kwargs}:
-            return OMFloat(float(x))
+            return OMFloat(float(x), id=kwargs.get("id"))
 
         case {"kind": "OMF", "hexadecimal": x, **kwargs}:
-            return OMFloat(float(x, 16))
+            return OMFloat(float(x, 16), id=kwargs.get("id"))
 
         case {"kind": "OMSTR", **kwargs}:
-            return OMBytearray(kwargs["string"])
+            return OMBytearray(kwargs["string"], id=kwargs.get("id"))
 
         case {"kind": "OMB", **kwargs}:
-            return OMBytearray(kwargs["bytes"])
+            return OMBytearray(kwargs["bytes"], id=kwargs.get("id"))
 
         case {"kind": "OMA", **kwargs}:
             return OMApplication(
                 fromDict(kwargs["applicant"]),
                 [fromDict(a) for a in kwargs.get("arguments", [])],
                 cdbase=kwargs.get("cdbase"),
+                id=kwargs.get("id"),
             )
 
         case {"kind": "OMV", **kwargs}:
-            return OMVariable(kwargs["name"])
+            return OMVariable(kwargs["name"], id=kwargs.get("id"))
 
         case {"kind": "OMS", **kwargs}:
-            return OMSymbol(kwargs["name"], kwargs["cd"], cdbase=kwargs.get("cdbase"))
+            return OMSymbol(
+                kwargs["name"],
+                kwargs["cd"],
+                cdbase=kwargs.get("cdbase"),
+                id=kwargs.get("id"),
+            )
 
         case {"kind": "OMBIND", **kwargs}:
             return OMBinding(
@@ -768,6 +777,7 @@ def fromDict(dictionary):
                 [fromDict(v) for v in kwargs["variables"]],
                 fromDict(kwargs["object"]),
                 cdbase=kwargs.get("cdbase"),
+                id=kwargs.get("id"),
             )
 
         case {"kind": "OMATTR", **kwargs}:
@@ -780,16 +790,21 @@ def fromDict(dictionary):
                 recFromDict(kwargs["attributes"]),
                 fromDict(kwargs["object"]),
                 kwargs.get("cdbase"),
+                id=kwargs.get("id"),
             )
 
         case {"kind": "OME", **kwargs}:
-            return OMError(kwargs["error"], kwargs.get("arguments"))
+            return OMError(
+                kwargs["error"], kwargs.get("arguments"), id=kwargs.get("id")
+            )
 
         case {"kind": "OMR", "href": href, **kwargs}:
-            return OMReference(href)
-        
+            return OMReference(href, id=kwargs.get("id"))
+
         case {"kind": "OMFOREIGN", "foreign": foreign, **kwargs}:
-            return OMForeign(foreign, encoding=kwargs.get("encoding"))
+            return OMForeign(
+                foreign, encoding=kwargs.get("encoding"), id=kwargs.get("id")
+            )
 
         case _:
             raise ValueError("A valid dictionary is required")
@@ -816,37 +831,41 @@ def fromElement(elem):
 
         case "OMI":
             if elem.text.strip()[0] == "x":
-                return OMInteger(int(elem.text.strip()[1:]))
+                return OMInteger(int(elem.text.strip()[1:]), id=elem.attrib.get("id"))
             elif elem.text.strip()[:2] == "-x":
-                return OMInteger(-int(elem.text.strip()[2:]))
+                return OMInteger(-int(elem.text.strip()[2:]), id=elem.attrib.get("id"))
             else:
-                return OMInteger(int(elem.text.strip()))
+                return OMInteger(int(elem.text.strip()), id=elem.attrib.get("id"))
 
         case "OMF":
             if "dec" in elem.attrib:
-                return OMFloat(float(elem.attrib["dec"]))
+                return OMFloat(float(elem.attrib["dec"]), id=elem.attrib.get("id"))
             else:
-                return OMFloat(float(elem.attrib["hex"]))
+                return OMFloat(float(elem.attrib["hex"]), id=elem.attrib.get("id"))
 
         case "OMS":
             return OMSymbol(
-                elem.attrib["name"], elem.attrib["cd"], elem.attrib.get("cdbase")
+                elem.attrib["name"],
+                elem.attrib["cd"],
+                elem.attrib.get("cdbase"),
+                id=elem.attrib.get("id"),
             )
 
         case "OMV":
-            return OMVariable(elem.attrib["name"])
+            return OMVariable(elem.attrib["name"], id=elem.attrib.get("id"))
 
         case "OMSTR":
-            return OMString(elem.text)
+            return OMString(elem.text, id=elem.attrib.get("id"))
 
         case "OMB":
-            return OMBytearray(b64decode(elem.text))
+            return OMBytearray(b64decode(elem.text), id=elem.attrib.get("id"))
 
         case "OMA":
             return OMApplication(
                 fromElement(elem[0]),
                 [fromElement(x) for x in elem[1:]],
                 cdbase=elem.attrib.get("cdbase"),
+                id=elem.attrib.get("id"),
             )
 
         case "OMATTR":
@@ -862,26 +881,37 @@ def fromElement(elem):
                             key = x
                 else:
                     obj = fromElement(child)
-            return OMAttribution(attrs, obj, cdbase=elem.attrib.get("cdbase"))
+            return OMAttribution(
+                attrs, obj, cdbase=elem.attrib.get("cdbase"), id=elem.attrib.get("id")
+            )
 
         case "OME":
-            return OMError(fromElement(elem[0]), [fromElement(x) for x in elem[1:]])
+            return OMError(
+                fromElement(elem[0]),
+                [fromElement(x) for x in elem[1:]],
+                id=elem.attrib.get("id"),
+            )
 
         case "OMBIND":
             return OMBinding(
                 fromElement(elem[0]),
                 [fromElement(x) for x in elem.find(qname("OMBVAR"))],
                 fromElement(elem[2]),
+                id=elem.attrib.get("id"),
             )
 
         case "OMR":
-            return OMReference(elem.attrib["href"])
+            return OMReference(elem.attrib["href"], id=elem.attrib.get("id"))
 
         case "OMFOREIGN":
             childcount = len(list(elem))
             if childcount > 1:
                 raise ValueError("OMFOREIGN objects can't have multiple children")
-            return OMForeign(elem[0] if childcount == 1 else elem.text, elem.attrib.get("encoding"))
+            return OMForeign(
+                elem[0] if childcount == 1 else elem.text,
+                elem.attrib.get("encoding"),
+                id=elem.attrib.get("id"),
+            )
 
         case _:
             raise ValueError("A valid ElementTree is required: %s" % elem)
