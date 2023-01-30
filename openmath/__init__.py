@@ -4,7 +4,7 @@ This module provides class and functions to
 work with OpenMath mathematical objects
 """
 import json
-import requests
+import urllib.request, urllib.error
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
 from copy import deepcopy
@@ -171,9 +171,9 @@ class _OMBase:
 
     def getRoot(self):
         """Get the root object"""
-        if parent is None:
+        if self.parent is None:
             return self
-        return parent.getRoot()
+        return self.parent.getRoot()
 
     def getByID(self, id):
         """Get an object by its ID"""
@@ -645,12 +645,13 @@ class OMReference(_OMBase):
             objectStr = None
 
             if url.startswith("http"):  # remote reference
-                response = requests.get(url)
-                if not response:
+                try:
+                    with urllib.request.open(url) as urlh:
+                        objectStr = urlh.read()
+                except urllib.error.URLError as e:
                     raise RuntimeError(
-                        "Could not resolve %s (%s)" % (self.href), response
+                        "Could not resolve %s (%s)" % (self.href, e)
                     )
-                objectStr = response.text
 
             else:  # local reference
                 try:
