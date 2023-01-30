@@ -587,6 +587,33 @@ class OMError(_OMBase):
         return el
 
 
+class OMForeign(_OMBase):
+    """Implementation of OMFOREIGN objects
+    
+    Reference: https://openmath.org/standard/om20-2019-07-01/omstd20.html#sec_json-omforeign---foreign-objects
+    """
+
+    kind = "OMFOREIGN"
+    __match_args__ = ("foreign", "encoding")
+    
+    def __init__(self, foreign, encoding=None, id=None):
+        _setattrType(self, "id", id, (str, type(None)))
+        _setattrType(self, "encoding", encoding, (str, type(None)))
+        _valueAssert(foreign is not None, "Foreign object can't be None")
+    
+    def toElement(self):
+        el = ET.Element(self.kind)
+        el.set("id", self.__dict__.get("id"))
+        el.set("encoding", self.__dict__.get("encoding"))
+        if isinstance(self.foreign, ET.Element):
+            el.append(self.foreign)
+        elif type(self.foreign) is dict:
+            el.text = json.dumps(self.foreign)
+        else:
+            el.text = str(self.foreign)
+        return el
+
+
 class OMReference(_OMBase):
     """Implementation of references for structure sharing
 
@@ -651,6 +678,7 @@ class OMReference(_OMBase):
 
     def toElement(self):
         el = ET.Element(self.kind)
+        el.set("id", self.__dict__.get("id"))
         el.set("href", self.href)
         return el
 
@@ -757,6 +785,12 @@ def fromDict(dictionary):
         case {"kind": "OME", **kwargs}:
             return OMError(kwargs["error"], kwargs.get("arguments"))
 
+        case {"kind": "OMR", "href": href, **kwargs}:
+            return OMReference(href)
+        
+        case {"kind": "OMFOREIGN", "foreign": foreign, **kwargs}:
+            return OMForeign(foreign, encoding=kwargs.get("encoding"))
+
         case _:
             raise ValueError("A valid dictionary is required")
 
@@ -840,12 +874,20 @@ def fromElement(elem):
                 fromElement(elem[2]),
             )
 
+        case "OMR":
+            return OMReference(elem.attrib["href"])
+
+        case "OMFOREIGN":
+            childcount = len(list(elem))
+            if childcount > 1:
+                raise ValueError("OMFOREIGN objects can't have multiple children")
+            return OMForeign(elem[0] if childcount == 1 else elem.text, elem.attrib.get("encoding"))
+
         case _:
             raise ValueError("A valid ElementTree is required: %s" % elem)
 
 
 omr = OMObject(OMReference("../openmath/om/cos_0.om"))
-
 
 
 omr.dereference()
