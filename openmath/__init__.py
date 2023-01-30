@@ -270,7 +270,14 @@ class _OMBase:
         return all(compare(a.get(k), b.get(k)) for k in allkeys)
 
     def __repr__(self):
-        return "%s(%r)" % (self.__class__, self.__dict__)
+        return "%s(%s)" % (
+            self.__class__.__name__,
+            " ".join(
+                "=".join(str(x) for x in kv)
+                for kv in self.__dict__.items()
+                if kv[1] is not None
+            ),
+        )
 
 
 class OMObject(_OMBase):
@@ -649,9 +656,7 @@ class OMReference(_OMBase):
                     with urllib.request.open(url) as urlh:
                         objectStr = urlh.read()
                 except urllib.error.URLError as e:
-                    raise RuntimeError(
-                        "Could not resolve %s (%s)" % (self.href, e)
-                    )
+                    raise RuntimeError("Could not resolve %s (%s)" % (self.href, e))
 
             else:  # local reference
                 try:
@@ -916,11 +921,3 @@ def fromElement(elem):
 
         case _:
             raise ValueError("A valid ElementTree is required: %s" % elem)
-
-
-omr = OMObject(OMReference("../openmath/om/cos_0.om"))
-
-
-omr.dereference()
-
-print(omr.toXML(indent=2))
