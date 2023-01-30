@@ -244,12 +244,12 @@ class _OMBase:
         def checkItem(object_):
             if object_ == item:
                 raise _OMFound(object_)
-        
+
         try:
             self.apply(checkItem)
         except _OMFound as e:
             return True
-        
+
         return False
 
     def __eq__(self, other) -> bool:
