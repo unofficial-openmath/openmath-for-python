@@ -240,6 +240,18 @@ class _OMBase:
                         )
                 d[k] = tuple(attr)
 
+    def __contains__(self, item) -> bool:
+        def checkItem(object_):
+            if object_ == item:
+                raise _OMFound(object_)
+        
+        try:
+            self.apply(checkItem)
+        except _OMFound as e:
+            return True
+        
+        return False
+
     def __eq__(self, other) -> bool:
         """Return true if all attributes are present and equal in both instances"""
         # The object must be OM
