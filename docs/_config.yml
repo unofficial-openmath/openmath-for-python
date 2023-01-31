@@ -1,0 +1,11 @@
+title: OpenMath for Python
+description: Documentation of the package OpenMath for Python, an unofficial implementation of the OpenMath standard v2
+kramdown:
+  parse_block_html: true
+
+plugins:
+  - jekyll-toc
+
+toc:
+  min_level: 1
+  max_level: 2

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html data-theme="dark" lang="en">
+
+<head>
+    <title>{{ page.title }} - {{ site.title }}</title>
+    <meta charset="UTF-8">
+    <meta name="keywords" content="{{ site.keywords }}">
+    <meta name="description" content="{{ site.description }}">
+    <meta name="author" content="MiguelMJ">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="icon" type="image/x-icon" href="/assets/img/favicon.ico">
+
+    <link rel="stylesheet" href="/assets/css/pico.classless.min.css">
+    <link rel="stylesheet" href="/assets/css/pico.docs.min.css">
+    <link rel="stylesheet" href="/assets/css/custom.css">
+
+    <script src="/assets/js/switchTheme.js"></script>
+
+</head>
+
+<body>
+    <main>
+        <aside>
+            <nav>
+                <ul>
+                    <li><a href="./">Home</a></li>
+                    <li><a href="./quickstart">Quickstart</a></li>
+                    <li><a href="./docs">Docs</a></li>
+                    <li><a href="https://github.com/MiguelMJ/openmath-for-python">GitHub</a></li>
+                </ul>
+                <hr/>
+                <details open>
+                    <summary>Contents</summary>
+                    {{ content | toc_only}}
+                </details>
+            </nav>
+        </aside>
+        <div role="document">
+            <section>
+                <input aria-label="switch theme" style="float:right" type="checkbox" role="switch" onchange="switchTheme()"/>
+                {{ content }}
+            </section>
+            <footer>
+                <hr>
+                <p>
+                    <small>Made with <a href="https://picocss.com/">Pico.css</a> and <a href="https://jekyllrb.com/">Jekyll</a></small>
+                </p>
+            </footer>
+        </div>
+    </main>
+</body>
+
+</html>
