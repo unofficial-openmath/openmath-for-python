@@ -12,8 +12,9 @@
     <link rel="icon" type="image/x-icon" href="/assets/img/favicon.ico">
 
     <link rel="stylesheet" href="/assets/css/pico.classless.min.css">
-    <link rel="stylesheet" href="/assets/css/pico.docs.min.css">
+    <link rel="stylesheet" href="/assets/css/pico.docs.css">
     <link rel="stylesheet" href="/assets/css/custom.css">
+    <link rel="stylesheet" href="/assets/css/syntax-base16.solarized.light.css">
 
     <script src="/assets/js/switchTheme.js"></script>
 
@@ -25,15 +26,23 @@
             <nav>
                 <ul>
                     <li><a href="./">Home</a></li>
-                    <li><a href="./quickstart">Quickstart</a></li>
-                    <li><a href="./docs">Docs</a></li>
-                    <li><a href="https://github.com/MiguelMJ/openmath-for-python">GitHub</a></li>
+                    <li><a href="./tutorial">Tutorial</a></li>
                 </ul>
                 <hr/>
                 <details open>
-                    <summary>Contents</summary>
-                    {% include toc.html html=content h_min=2 h_max=2%}
+                    <summary>Modules</summary>
+                    <ul>
+                        <li><a href="./openmath"><code>openmath</code></a></li>
+                        <li><a href="./openmath_cd"><code>openmath.cd</code></a></li>
+                    </ul>
                 </details>
+                <hr/>
+                <details open>
+                    <summary>Contents</summary>
+                    {% include toc.html html=content h_min=2 h_max=2 %}
+                </details>
+                <hr/>
+                <li><a href="https://github.com/MiguelMJ/openmath-for-python">GitHub</a></li>
             </nav>
         </aside>
         <div role="document">
