@@ -1,6 +1,6 @@
 <hgroup class="no_toc_section">
 <h1 align="center">OpenMath for Python</h1>
-<h2 align="center">Unofficial implementation of the OpenMath standard</h2>
+<h3 align="center">Unofficial implementation of the OpenMath standard</h3>
 </hgroup>
 <p align="center">
 <img src="https://img.shields.io/badge/python-3.10-306998?style=for-the-badge&logo=python&logoColor=ffdc51">
