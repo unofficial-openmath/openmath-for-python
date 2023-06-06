@@ -4,7 +4,7 @@
 </hgroup>
 <p align="center">
 <img src="https://img.shields.io/badge/python-3.10-306998?style=for-the-badge&logo=python&logoColor=ffdc51">
-<a role="link" href="https://www.openmath.org"><img src="https://img.shields.io/badge/OpenMath-2.0-5b78fd?style=for-the-badge"></a>
+<a role="link" href="https://openmath.org/standard/om20-2019-07-01/"><img src="https://img.shields.io/badge/OpenMath-2.0-5b78fd?style=for-the-badge"></a>
 <a role="link" href="https://github.com/MiguelMJ/openmath-for-python/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-informational?style=for-the-badge"/></a>
 </p>
 
