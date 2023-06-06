@@ -25,7 +25,7 @@ def _removeNoneAttrib(elem):
 
 def _assertType(x, types):
     if not isinstance(x, types):
-        raise ValueError("Expected %s, but got %s" % ("or".join(types), type(x)))
+        raise ValueError("Expected %s, but got %s" % (" or ".join(t.__name__ for t in types), type(x).__name__))
 
 
 def _setattrType(obj, attr, value, types):
@@ -291,6 +291,16 @@ class _OMBase:
             ),
         )
 
+    def __str__(self):
+        return "%s(%s)" % (
+            self.__class__.__name__,
+            " ".join(
+                "=".join(str(x) for x in kv)
+                for kv in self.__dict__.items()
+                if kv[1] is not None and kv[0] != "parent"
+            )
+        )
+
 
 class OMObject(_OMBase):
     """Implementation of the OpenMath object constructor OMOBJ
@@ -438,7 +448,7 @@ class OMVariable(_OMBase):
     """
 
     kind = "OMV"
-    __match_args__ = ("variable",)
+    __match_args__ = ("name",)
 
     def __init__(self, name: str, id=None):
         _setattrType(self, "id", id, (str, type(None)))
