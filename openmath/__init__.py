@@ -78,7 +78,16 @@ class _OMBase:
         d = self.__dict__
         return {
             "kind": self.kind,
-            **{k: d[k].toDict() if isOM(d[k]) else d[k] for k in sorted(d.keys()) if d[k] is not None and k != "parent"},
+            **{
+                k: d[k].toDict() 
+                    if isOM(d[k]) 
+                    else [x.toDict() if isOM(x) else x for x in d[k]]
+                        if hasattr(d[k], "__iter__")
+                        else d[k]
+                for k 
+                in sorted(d.keys()) 
+                if d[k] is not None and k != "parent"
+            },
         }
 
     def toJSON(self, *args, **kwargs) -> str:
