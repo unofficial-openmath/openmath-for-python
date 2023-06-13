@@ -82,7 +82,7 @@ class _OMBase:
                 k: d[k].toDict() 
                     if isOM(d[k]) 
                     else [x.toDict() if isOM(x) else x for x in d[k]]
-                        if hasattr(d[k], "__iter__")
+                        if type(d[k]) is not str and hasattr(d[k], "__iter__")
                         else d[k]
                 for k 
                 in sorted(d.keys()) 
