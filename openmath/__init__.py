@@ -154,18 +154,19 @@ class _OMBase:
         accumulator.append(self)
         # First apply to self and then to attributes
         f(self)
-        d = self.toDict()
+        d = {**self.__dict__}
+        d["parent"] = None
 
         for k in list(d.keys())[::-1]:  # reversed keys
             value = d[k]
             if isOM(value):  # level of depth 0
                 value.apply(f, accumulator)
 
-            elif type(value) is tuple:  # level of depth 1
+            elif type(value) is not str and hasattr(value, "__iter__"):  # level of depth 1
                 for subval in value:
                     if isOM(subval):
                         subval.apply(f, accumulator)
-                    elif type(subval) is tuple:  # level of depth 2 (for OMATTR)
+                    elif type(subval) is not str and hasattr(subval, "__iter__"):  # level of depth 2 (for OMATTR)
                         for subsubval in subval:
                             if isOM(subsubval):
                                 subsubval.apply(f, accumulator)
@@ -190,7 +191,7 @@ class _OMBase:
         def checkID(object_):
             if object_.id == id:
                 raise _OMFound(object_)
-
+            
         try:
             self.apply(checkID)
         except _OMFound as e:
