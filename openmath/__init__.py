@@ -55,7 +55,7 @@ def isOM(x, kinds=None):
 
 def assertOM(x, kinds=None):
     if not isOM(x):
-        raise ValueError("Expected an OM object")
+        raise ValueError("Expected an OM object, but got "+type(x).__name__)
 
     if kinds is not None and type(kinds) is not list:
         kinds = [kinds]
