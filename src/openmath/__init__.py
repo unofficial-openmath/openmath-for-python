@@ -1,10 +1,3 @@
-"""OpenMath standard implementation
-
-This module provides class and functions to
-work with OpenMath mathematical objects
-"""
-
-
 from .om.omapplication import OMApplication
 from .om.omattribution import OMAttribution
 from .om.ombinding import OMBinding

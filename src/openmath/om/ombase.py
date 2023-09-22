@@ -218,7 +218,7 @@ class OMBase:
         def compare(x, y):
             """Compare a single value that may be a list"""
             ret = None
-            if type(x) is list and type(y) is list:
+            if hasattr(x, "__iter__") and hasattr(y, "__iter__"):
                 ret = len(x) == len(y) and all(
                     compare(x[i], y[i]) for i in range(len(x))
                 )

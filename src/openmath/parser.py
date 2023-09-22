@@ -8,10 +8,12 @@ def parse(text):
 
     See parseJSON and parseXML
     """
-    try:
+    if text.lstrip()[0] == "{":
         return parseJSON(text)
-    except json.JSONDecodeError:
+    elif text.lstrip()[0] == "<":
         return parseXML(text)
+    
+    raise ValueError("Unable to detect encoding")
 
 def parseJSON(text):
     """Parse a JSON string into a mathematical object

@@ -14,7 +14,7 @@ def removeNoneAttrib(elem):
 
 def assertType(x, types):
     if not isinstance(x, types):
-        raise ValueError("Expected %s, but got %s" % (" or ".join(t.__name__ for t in types), type(x).__name__))
+        raise TypeError("Expected %s, but got %s" % (" or ".join(t.__name__ for t in types), type(x).__name__))
 
 
 def setattrType(obj, attr, value, types):
@@ -44,12 +44,12 @@ def isOM(x, kinds=None):
 
 def assertOM(x, kinds=None):
     if not isOM(x):
-        raise ValueError("Expected an OM object, but got "+type(x).__name__)
+        raise TypeError("Expected an OM object, but got "+type(x).__name__)
 
     if kinds is not None and type(kinds) is not list:
         kinds = [kinds]
 
     if kinds is not None and x.kind not in kinds:
-        raise ValueError(
+        raise TypeError(
             "Expected %s object, but got %s" % (" or ".join(kinds), x.kind)
         )
