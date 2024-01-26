@@ -12,7 +12,7 @@ This package provides the classes and functions to implement the [OpenMath stand
 
 ## Features
 
-- Implementation of all OpenMath objects and Content Dictionariess.
+- Implementation of all OpenMath objects and Content Dictionaries.
 - An idiomatic interface for common operations.
 - Support for XML and JSON encodings.
 - Written in pure python.
