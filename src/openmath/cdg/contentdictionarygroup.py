@@ -3,17 +3,15 @@ from dataclasses import dataclass, field
 from .. import OMSymbol
 
 @dataclass
-class ContentDictionary:
+class ContentDictionaryGroup:
     name: str = None
     description: str = None
-    revision: str = None
-    review: str = None
     version: str = None
-    status: str = None
-    base: str = None
+    revision: str = None
     url: str = None
+    memebers: list = field(default_factory=list)
+    includes: list = field(default_factory=list)
     comment: str = field(default=None, repr=False)
-    definitions: list = field(default_factory=list)
 
     def __getitem__(self, key):
         if type(key) == int:
@@ -25,13 +23,8 @@ class ContentDictionary:
                     return d
             raise KeyError(key)
 
-        if isinstance(key, OMSymbol):
-            if key.getCDBase != self.cdbase or key.cd != self.name:
-                raise KeyError(key)
-            return __getitem__[key.name]
-
         raise TypeError(
-            "ContentDictionary indices must be integers, strings or openmath.OMSymbol"
+            "ContentDictionaryGroup indices must be integers or strings"
         )
 
     def __contains__(self, key):

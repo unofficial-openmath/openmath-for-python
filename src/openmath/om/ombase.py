@@ -10,6 +10,15 @@ class OMBase:
     id = None
     parent = None
 
+
+    def _isOM(x, kinds=None):
+        if not isinstance(x, OMBase):
+            return False
+        if kinds is not None and type(kinds) is not list:
+            kinds = [kinds]
+
+        return kinds is None or x.kind in kinds
+
     def toDict(self) -> dict:
         """Get a dictionary with the attributes of the math object"""
         d = self.__dict__
@@ -17,8 +26,8 @@ class OMBase:
             "kind": self.kind,
             **{
                 k: d[k].toDict() 
-                    if isOM(d[k]) 
-                    else [x.toDict() if isOM(x) else x for x in d[k]]
+                    if OMBase._isOM(d[k]) 
+                    else [x.toDict() if OMBase._isOM(x) else x for x in d[k]]
                         if type(d[k]) is not str and hasattr(d[k], "__iter__")
                         else d[k]
                 for k 
@@ -96,16 +105,16 @@ class OMBase:
 
         for k in list(d.keys())[::-1]:  # reversed keys
             value = d[k]
-            if isOM(value):  # level of depth 0
+            if OMBase._isOM(value):  # level of depth 0
                 value.apply(f, accumulator)
 
             elif type(value) is not str and hasattr(value, "__iter__"):  # level of depth 1
                 for subval in value:
-                    if isOM(subval):
+                    if OMBase._isOM(subval):
                         subval.apply(f, accumulator)
                     elif type(subval) is not str and hasattr(subval, "__iter__"):  # level of depth 2 (for OMATTR)
                         for subsubval in subval:
-                            if isOM(subsubval):
+                            if OMBase._isOM(subsubval):
                                 subsubval.apply(f, accumulator)
 
     def getCDBase(self) -> str:
@@ -202,7 +211,7 @@ class OMBase:
     def __eq__(self, other) -> bool:
         """Return true if all attributes are present and equal in both instances"""
         # The object must be OM
-        if not isOM(other):
+        if not OMBase._isOM(other):
             return False
 
         a = self.toDict()

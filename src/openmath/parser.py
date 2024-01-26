@@ -1,6 +1,7 @@
-import openmath
+from . import *
 from base64 import b64decode
 import xml.etree.ElementTree as ET
+import struct
 import json
 
 def parse(text):
@@ -160,7 +161,7 @@ def fromElement(elem):
             if "dec" in elem.attrib:
                 return OMFloat(float(elem.attrib["dec"]), id=elem.attrib.get("id"))
             else:
-                return OMFloat(float(elem.attrib["hex"]), id=elem.attrib.get("id"))
+                return OMFloat(struct.unpack("!d", bytes.fromhex(elem.attrib["hex"])), id=elem.attrib.get("id"))
 
         case "OMS":
             return OMSymbol(

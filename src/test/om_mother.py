@@ -9,59 +9,58 @@ def of(kind: str, **kargs):
 def genOMobject():
     return of(choice(map.keys()))
 
-def genOMinteger(value=randint(-1000, 1000)):
+def _genOMinteger(value=randint(-1000, 1000)):
     return OMInteger(value)
 
-def genOMstring(value=choice(["foo","bar","baz"])):
+def _genOMstring(value=choice(["foo","bar","baz"])):
     return OMString(value)
 
-def genOMbytearray(value=randbytes(8)):
+def _genOMbytearray(value=randbytes(8)):
     return OMBytearray(value)
 
-def genOMfloat(value=random()):
+def _genOMfloat(value=random()):
     return OMFloat(value)
 
-def genOMsymbol(name=choice([
+def _genOMsymbol(name=choice([
         "sym_foo",
         "sym_bar",
         "sym_baz",
     ]), cd="test_cd"):
     return OMSymbol(name, cd)
 
-def genOMvariable(name=choice([
+def _genOMvariable(name=choice([
         "var_foo",
         "var_bar",
         "var_baz",
     ])):
     return OMVariable(name)
 
-def genOMapplication(symbol=genOMsymbol(), args=()):
+def _genOMapplication(symbol=_genOMsymbol(), args=()):
     return OMApplication(symbol, args)
 
-def genOMbinding(
-        symbol=genOMsymbol(), 
-        variables=(genOMvariable(), genOMvariable()),
-        object_=genOMsymbol()
+def _genOMbinding(
+        symbol=_genOMsymbol(), 
+        variables=(_genOMvariable(), _genOMvariable()),
+        object_=_genOMsymbol()
     ):
     return OMBinding(symbol, variables, object_)
 
-def genOMattribution(
-        object_=genOMsymbol(),
-        attributes=((genOMsymbol(), genOMstring()),)
+def _genOMattribution(
+        object_=_genOMsymbol(),
+        attributes=((_genOMsymbol(), _genOMstring()),)
     ):
     return OMAttribution(attributes, object_)
 
 map = {
-    OMInteger.kind: genOMinteger,
-    OMString.kind: genOMstring,
-    OMFloat.kind: genOMfloat,
-    OMBytearray.kind: genOMbytearray,
-    OMSymbol.kind: genOMsymbol,
-    OMVariable.kind: genOMvariable,
-    OMApplication.kind: genOMapplication,
-    OMVariable.kind: genOMvariable,
-    OMBinding.kind: genOMbinding,
-    OMAttribution.kind: genOMattribution,
+    OMInteger.kind: _genOMinteger,
+    OMString.kind: _genOMstring,
+    OMFloat.kind: _genOMfloat,
+    OMBytearray.kind: _genOMbytearray,
+    OMSymbol.kind: _genOMsymbol,
+    OMApplication.kind: _genOMapplication,
+    OMVariable.kind: _genOMvariable,
+    OMBinding.kind: _genOMbinding,
+    OMAttribution.kind: _genOMattribution,
     # OMReference.kind: genOMreference,
     # OMError.kind: genOMerror,
     # OMForeign.kind: genOMforeign,

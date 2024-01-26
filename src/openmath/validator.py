@@ -24,7 +24,7 @@ def validate(omobj: OMBase, **kargs):
     
     def singleValidate(obj):
         if obj.kind == OMSymbol.kind:
-            cd, symbolDefinition = getCDAndSymbolDefinition(obj)
+            cd, symbolDefinition = _getCDAndSymbolDefinition(obj)
             
             if symbolDefinition is None: 
                 symbolsNotFound.append(obj.applicant)
@@ -56,6 +56,10 @@ def validate(omobj: OMBase, **kargs):
         "warning": ValidationResult.WARNING,
         "error": ValidationResult.ERROR
     }
+    returnConfig = {
+        ""
+        **kargs
+    }
 
     omobj.apply(singleValidate)
     if len(symbolsWithInvalidRole) > 0:
@@ -67,15 +71,14 @@ def validate(omobj: OMBase, **kargs):
     return ValidationResult.OK
 
 
-def getCDAndSymbolDefinition(symbol):
+def _getCDAndSymbolDefinition(symbol):
     for cd in cds:
         if symbol in cd:
             return cd, cd[symbol]
     return (None, None)
         
 
-
-def loadCDFromFile(filepath):
+def _loadCDFromFile(filepath):
     with open(filepath) as fh:
         cd.append(
             parseCD(fh.read())
@@ -101,4 +104,4 @@ def _loadCDs(cd_paths, on_experimental, on_obsolete):
     
             for filepath in route:
                 if filepath.suffix.lower() == ".ocd":
-                    loadCDFromFile(filepath)
+                    _loadCDFromFile(filepath)

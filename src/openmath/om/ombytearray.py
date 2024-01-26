@@ -1,6 +1,6 @@
 from .ombase import OMBase
 from ..util import setattrType
-from base64 import b64encode
+import base64
 import xml.etree.ElementTree as ET
 
 class OMBytearray(OMBase):
@@ -12,12 +12,12 @@ class OMBytearray(OMBase):
     kind = "OMB"
     __match_args__ = ("bytes",)
 
-    def __init__(self, bytes_: list, id=None):
+    def __init__(self, bytes_, id=None):
         setattrType(self, "id", id, (str, type(None)))
         self.bytes = bytes(bytes_)
 
     def toElement(self):
         el = ET.Element(self.kind)
         el.set("id", self.__dict__.get("id"))
-        el.text = b64encode(self.bytes).decode("ascii")
+        el.text = base64.encodebytes(self.bytes).decode("ascii")
 
