@@ -3,13 +3,13 @@ from xml.dom import minidom
 import xml.etree.ElementTree as ET
 import json
 
+
 class OMBase:
     """Base class for OpenMath objects"""
 
     kind = None
     id = None
     parent = None
-
 
     def _isOM(x, kinds=None):
         if not isinstance(x, OMBase):
@@ -26,11 +26,7 @@ class OMBase:
             if OMBase._isOM(x):
                 return x.toDict()
             elif type(x) is not str and hasattr(x, "__iter__"):
-                return [
-                    recursiveToDict(y)
-                    for y
-                    in x
-                ]
+                return [recursiveToDict(y) for y in x]
             else:
                 return x
 
@@ -38,8 +34,7 @@ class OMBase:
             "kind": self.kind,
             **{
                 key: recursiveToDict(val)
-                for key, val
-                in vars(self).items()
+                for key, val in vars(self).items()
                 if val is not None and key != "parent"
             },
         }
@@ -116,11 +111,15 @@ class OMBase:
             if OMBase._isOM(value):  # level of depth 0
                 value.apply(f, accumulator)
 
-            elif type(value) is not str and hasattr(value, "__iter__"):  # level of depth 1
+            elif type(value) is not str and hasattr(
+                value, "__iter__"
+            ):  # level of depth 1
                 for subval in value:
                     if OMBase._isOM(subval):
                         subval.apply(f, accumulator)
-                    elif type(subval) is not str and hasattr(subval, "__iter__"):  # level of depth 2 (for OMATTR)
+                    elif type(subval) is not str and hasattr(
+                        subval, "__iter__"
+                    ):  # level of depth 2 (for OMATTR)
                         for subsubval in subval:
                             if OMBase._isOM(subsubval):
                                 subsubval.apply(f, accumulator)
@@ -145,7 +144,7 @@ class OMBase:
         def checkID(object_):
             if object_.id == id:
                 raise _OMFound(object_)
-            
+
         try:
             self.apply(checkID)
         except _OMFound as e:
@@ -234,11 +233,14 @@ class OMBase:
         def compare(x, y):
             """Compare a single value that may be iterable"""
             ret = None
-            if hasattr(x, "__iter__") and hasattr(y, "__iter__") and not type(x) is str and not type(y) is str:
+            if (
+                hasattr(x, "__iter__")
+                and hasattr(y, "__iter__")
+                and not type(x) is str
+                and not type(y) is str
+            ):
                 keys = x.keys() if type(x) is dict else range(len(x))
-                ret = len(x) == len(y) and all(
-                    compare(x[i], y[i]) for i in keys
-                )
+                ret = len(x) == len(y) and all(compare(x[i], y[i]) for i in keys)
             else:
                 ret = x == y
             return ret
@@ -262,5 +264,5 @@ class OMBase:
                 "=".join(str(x) for x in kv)
                 for kv in self.__dict__.items()
                 if kv[1] is not None and kv[0] != "parent"
-            )
+            ),
         )

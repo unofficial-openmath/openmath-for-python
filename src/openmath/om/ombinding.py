@@ -3,6 +3,7 @@ from ..util import valueAssert
 from ..util import setattrType, setattrOM, assertOM
 import xml.etree.ElementTree as ET
 
+
 class OMBinding(OMBase):
     """Implementation of the OMBinding object
 
@@ -35,7 +36,8 @@ class OMBinding(OMBase):
             if v.kind == "OMATTR":
                 valueAssert(
                     v.object.kind == "OMV",
-                    "Attributed variable binding must can't use "+type(v.object).__name__,
+                    "Attributed variable binding must can't use "
+                    + type(v.object).__name__,
                 )
             v.parent = self
         self.variables = tuple(variables)

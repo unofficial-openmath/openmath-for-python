@@ -2,6 +2,7 @@ from .ombase import OMBase
 from ..util import setattrType
 import xml.etree.ElementTree as ET
 
+
 class OMInteger(OMBase):
     """Implementation of the OMInteger object
 
@@ -20,4 +21,3 @@ class OMInteger(OMBase):
         el.set("id", self.__dict__.get("id"))
         el.text = str(self.integer)
         return el
-

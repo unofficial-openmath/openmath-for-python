@@ -2,6 +2,7 @@ from .ombase import OMBase
 from ..util import setattrType, setattrOM
 import xml.etree.ElementTree as ET
 
+
 class OMObject(OMBase):
     """Implementation of the OpenMath object constructor OMOBJ
 
@@ -35,4 +36,3 @@ class OMObject(OMBase):
         el.set("id", self.__dict__.get("id"))
         el.append(self.object.toElement())
         return el
-

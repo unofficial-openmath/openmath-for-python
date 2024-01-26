@@ -3,53 +3,73 @@ from random import randint, randbytes, random, choice
 
 map = {}
 
+
 def of(kind: str, **kargs):
     return map[kind](**kargs)
+
 
 def _genOMobject():
     return OMObject(of(choice(list(map.keys()))))
 
+
 def _genOMinteger(value=randint(-1000, 1000)):
     return OMInteger(value)
 
-def _genOMstring(value=choice(["foo","bar","baz"])):
+
+def _genOMstring(value=choice(["foo", "bar", "baz"])):
     return OMString(value)
+
 
 def _genOMbytearray(value=randbytes(8)):
     return OMBytearray(value)
 
+
 def _genOMfloat(value=random()):
     return OMFloat(value)
 
-def _genOMsymbol(name=choice([
-        "sym_foo",
-        "sym_bar",
-        "sym_baz",
-    ]), cd="test_cd"):
+
+def _genOMsymbol(
+    name=choice(
+        [
+            "sym_foo",
+            "sym_bar",
+            "sym_baz",
+        ]
+    ),
+    cd="test_cd",
+):
     return OMSymbol(name, cd)
 
-def _genOMvariable(name=choice([
-        "var_foo",
-        "var_bar",
-        "var_baz",
-    ])):
+
+def _genOMvariable(
+    name=choice(
+        [
+            "var_foo",
+            "var_bar",
+            "var_baz",
+        ]
+    )
+):
     return OMVariable(name)
+
 
 def _genOMapplication(symbol=_genOMsymbol(), args=()):
     return OMApplication(symbol, args)
 
+
 def _genOMbinding(
-        symbol=_genOMsymbol(), 
-        variables=(_genOMvariable(), _genOMvariable()),
-        object_=_genOMsymbol()
-    ):
+    symbol=_genOMsymbol(),
+    variables=(_genOMvariable(), _genOMvariable()),
+    object_=_genOMsymbol(),
+):
     return OMBinding(symbol, variables, object_)
 
+
 def _genOMattribution(
-        object_=_genOMsymbol(),
-        attributes=((_genOMsymbol(), _genOMstring()),)
-    ):
+    object_=_genOMsymbol(), attributes=((_genOMsymbol(), _genOMstring()),)
+):
     return OMAttribution(attributes, object_)
+
 
 map = {
     OMInteger.kind: _genOMinteger,

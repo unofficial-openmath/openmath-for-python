@@ -11,9 +11,9 @@ class TestOMareOM(unittest.TestCase):
         self.assertFalse(isOM("foo"))
         self.assertFalse(isOM({}))
         self.assertFalse(isOM([]))
-        self.assertFalse(isOM(bytearray(b'bar')))
+        self.assertFalse(isOM(bytearray(b"bar")))
         self.assertFalse(isOM(object()))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

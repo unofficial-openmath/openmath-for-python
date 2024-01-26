@@ -3,6 +3,7 @@ from .omsymbol import OMSymbol
 from ..util import setattrType, setattrOM, assertOM
 import xml.etree.ElementTree as ET
 
+
 class OMApplication(OMBase):
     """Implementation of the OMApplication object
 

@@ -2,6 +2,7 @@ from .ombase import OMBase
 from ..util import setattrType
 import xml.etree.ElementTree as ET
 
+
 class OMVariable(OMBase):
     """Implementation of the OMVariable object
 
@@ -20,4 +21,3 @@ class OMVariable(OMBase):
         el.set("id", self.__dict__.get("id"))
         el.set("name", self.name)
         return el
-

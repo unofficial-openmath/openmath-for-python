@@ -2,6 +2,7 @@ from .ombase import OMBase
 from ..util import setattrType
 import xml.etree.ElementTree as ET
 
+
 class OMFloat(OMBase):
     """Implementation of the OMFloat object
 

@@ -2,6 +2,7 @@ import unittest
 from openmath import *
 from openmath.util import *
 
+
 class TestOMSymbol(unittest.TestCase):
 
     def test_name(self):
@@ -13,7 +14,7 @@ class TestOMSymbol(unittest.TestCase):
         self.assertEqual(cd, omv.cd)
         self.assertTrue(isOM(omv), f"OMS should be OM")
         self.assertIsNone(omv.id)
-    
+
     def test_dict(self):
         omv = OMSymbol("name", "dict")
         out = omv.toDict()
@@ -28,5 +29,6 @@ class TestOMSymbol(unittest.TestCase):
         self.assertEqual(id, omv.id)
         self.assertEqual(id, omv.toDict()["id"])
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

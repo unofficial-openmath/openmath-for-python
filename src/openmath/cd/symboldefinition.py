@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 
 from ..om.ombase import OMBase
 
+
 @dataclass
 class SymbolDefinition:
     name: str = None

@@ -2,6 +2,7 @@ from .ombase import OMBase
 from ..util import setattrType
 import xml.etree.ElementTree as ET
 
+
 class OMString(OMBase):
     """Implementation of the OMString object
 
@@ -20,4 +21,3 @@ class OMString(OMBase):
         el.set("id", self.__dict__.get("id"))
         el.text = self.string
         return el
-

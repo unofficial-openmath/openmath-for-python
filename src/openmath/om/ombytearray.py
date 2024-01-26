@@ -3,6 +3,7 @@ from ..util import setattrType
 import base64
 import xml.etree.ElementTree as ET
 
+
 class OMBytearray(OMBase):
     """Implementation of the OMBytearray object
 
@@ -20,4 +21,3 @@ class OMBytearray(OMBase):
         el = ET.Element(self.kind)
         el.set("id", self.__dict__.get("id"))
         el.text = base64.encodebytes(self.bytes).decode("ascii")
-

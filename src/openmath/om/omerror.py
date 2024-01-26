@@ -2,6 +2,7 @@ from .ombase import OMBase
 from ..util import setattrType, setattrOM
 import xml.etree.ElementTree as ET
 
+
 class OMError(OMBase):
     """Implementation of the OMError object
 

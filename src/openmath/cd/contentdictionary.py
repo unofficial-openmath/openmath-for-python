@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 
 from .. import OMSymbol
 
+
 @dataclass
 class ContentDictionary:
     name: str = None

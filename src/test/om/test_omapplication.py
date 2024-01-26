@@ -7,6 +7,7 @@ APPLICANT = om_mother.of("OMS")
 NARG = 3
 ARGUMENTS = tuple(om_mother.of("OMOBJ") for _ in range(NARG))
 
+
 class TestOMApplication(unittest.TestCase):
 
     def setUp(self):
@@ -17,10 +18,14 @@ class TestOMApplication(unittest.TestCase):
         self.assertTupleEqual(ARGUMENTS, self.oma.arguments)
         self.assertTrue(isOM(self.oma), f"OMA should be OM")
         self.assertIsNone(self.oma.id)
-    
+
     def test_dict(self):
         out = self.oma.toDict()
-        expected = {"kind": "OMA", "applicant": APPLICANT.toDict(), "arguments": [arg.toDict() for arg in ARGUMENTS]}
+        expected = {
+            "kind": "OMA",
+            "applicant": APPLICANT.toDict(),
+            "arguments": [arg.toDict() for arg in ARGUMENTS],
+        }
         self.assertDictEqual(expected, out)
 
     def test_with_id(self):
@@ -29,7 +34,7 @@ class TestOMApplication(unittest.TestCase):
 
         self.assertEqual(id, self.oma.id)
         self.assertEqual(id, self.oma.toDict()["id"])
-    
+
     def test_setters(self):
         new_applicant = om_mother.of("OMOBJ")
         new_args = (om_mother.of("OMOBJ"),)
@@ -38,5 +43,6 @@ class TestOMApplication(unittest.TestCase):
         self.assertEqual(new_applicant, self.oma.applicant)
         self.assertTupleEqual(new_args, self.oma.arguments)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

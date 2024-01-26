@@ -2,7 +2,8 @@ import unittest
 from openmath import *
 from openmath.util import *
 
-BYTEARRAY = bytearray([0x01, 0x02, 0xff])
+BYTEARRAY = bytearray([0x01, 0x02, 0xFF])
+
 
 class TestOMBytearray(unittest.TestCase):
 
@@ -27,5 +28,6 @@ class TestOMBytearray(unittest.TestCase):
         self.assertEqual(id, omb.id)
         self.assertEqual(id, omb.toDict()["id"])
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

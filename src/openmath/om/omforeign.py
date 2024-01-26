@@ -3,6 +3,7 @@ from ..util import setattrType
 import xml.etree.ElementTree as ET
 import json
 
+
 class OMForeign(OMBase):
     """Implementation of OMFOREIGN objects
 

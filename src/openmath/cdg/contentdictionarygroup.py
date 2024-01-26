@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 
 from .. import OMSymbol
 
+
 @dataclass
 class ContentDictionaryGroup:
     name: str = None
@@ -23,9 +24,7 @@ class ContentDictionaryGroup:
                     return d
             raise KeyError(key)
 
-        raise TypeError(
-            "ContentDictionaryGroup indices must be integers or strings"
-        )
+        raise TypeError("ContentDictionaryGroup indices must be integers or strings")
 
     def __contains__(self, key):
         if type(key) == str:

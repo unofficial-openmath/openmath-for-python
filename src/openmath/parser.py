@@ -4,6 +4,7 @@ import xml.etree.ElementTree as ET
 import struct
 import json
 
+
 def parse(text):
     """Parse either JSON or XML strings into a mathematical object
 
@@ -13,8 +14,9 @@ def parse(text):
         return parseJSON(text)
     elif text.lstrip()[0] == "<":
         return parseXML(text)
-    
+
     raise ValueError("Unable to detect encoding")
+
 
 def parseJSON(text):
     """Parse a JSON string into a mathematical object
@@ -45,7 +47,7 @@ def fromDict(dictionary):
                 cdbase=kwargs.get("cdbase"),
                 version=kwargs.get("version"),
                 xmlns=kwargs.get("xmlns"),
-                **kwargs
+                **kwargs,
             )
 
         case {"kind": "OMI", "integer": x, **kwargs}:
@@ -101,10 +103,8 @@ def fromDict(dictionary):
             )
 
         case {"kind": "OMATTR", **kwargs}:
-            recFromDict = (
-                lambda x: fromDict(x)
-                if type(x) is not list
-                else [recFromDict(xx) for xx in x]
+            recFromDict = lambda x: (
+                fromDict(x) if type(x) is not list else [recFromDict(xx) for xx in x]
             )
             return OMAttribution(
                 recFromDict(kwargs["attributes"]),
@@ -161,7 +161,10 @@ def fromElement(elem):
             if "dec" in elem.attrib:
                 return OMFloat(float(elem.attrib["dec"]), id=elem.attrib.get("id"))
             else:
-                return OMFloat(struct.unpack("!d", bytes.fromhex(elem.attrib["hex"])), id=elem.attrib.get("id"))
+                return OMFloat(
+                    struct.unpack("!d", bytes.fromhex(elem.attrib["hex"])),
+                    id=elem.attrib.get("id"),
+                )
 
         case "OMS":
             return OMSymbol(

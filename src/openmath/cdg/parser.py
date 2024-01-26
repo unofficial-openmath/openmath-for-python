@@ -2,6 +2,7 @@ from .contentdictionary import ContentDictionary
 from .symboldefinition import SymbolDefinition
 import xml.etree.ElementTree as ET
 
+
 def parseXML(text):
     """Parse a XML string into a Content Dictionary
 
@@ -59,9 +60,7 @@ def fromTree(tree):
                 setattr(symboldef, field, xmlelem.text.strip())
         symboldef.cmp = [x.text for x in element.findall(qname("CMP"))]
         symboldef.fmp = [x.text for x in element.findall(qname("FMP"))]
-        symboldef.examples = [
-            x.text for x in element.findall(qname("Example"))
-        ]
+        symboldef.examples = [x.text for x in element.findall(qname("Example"))]
         cd.definitions.append(symboldef)
 
     return cd

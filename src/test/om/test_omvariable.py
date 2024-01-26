@@ -2,6 +2,7 @@ import unittest
 from openmath import *
 from openmath.util import *
 
+
 class TestOMVariable(unittest.TestCase):
 
     def test_name(self):
@@ -11,7 +12,7 @@ class TestOMVariable(unittest.TestCase):
         self.assertEqual(name, omv.name)
         self.assertTrue(isOM(omv), f"OMV should be OM")
         self.assertIsNone(omv.id)
-    
+
     def test_dict(self):
         omv = OMVariable("abc")
         out = omv.toDict()
@@ -26,5 +27,6 @@ class TestOMVariable(unittest.TestCase):
         self.assertEqual(id, omv.id)
         self.assertEqual(id, omv.toDict()["id"])
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

@@ -1,8 +1,8 @@
-
 from .ombase import OMBase
 from ..util import setattrType
 import xml.etree.ElementTree as ET
 import urllib.request, urllib.error
+
 
 class OMReference(OMBase):
     """Implementation of references for structure sharing
@@ -70,4 +70,3 @@ class OMReference(OMBase):
         el.set("id", self.__dict__.get("id"))
         el.set("href", self.href)
         return el
-

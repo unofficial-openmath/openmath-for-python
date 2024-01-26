@@ -2,6 +2,7 @@ import unittest
 from openmath import *
 from openmath.util import *
 
+
 class TestOMInteger(unittest.TestCase):
 
     def test_value(self):
@@ -11,7 +12,7 @@ class TestOMInteger(unittest.TestCase):
         self.assertEqual(value, omi.integer)
         self.assertTrue(isOM(omi), f"OMI should be OM")
         self.assertIsNone(omi.id)
-    
+
     def test_dict(self):
         value = -42
         omi = OMInteger(value)
@@ -27,5 +28,6 @@ class TestOMInteger(unittest.TestCase):
         self.assertEqual(id, omi.id)
         self.assertEqual(id, omi.toDict()["id"])
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

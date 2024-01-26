@@ -2,6 +2,7 @@ from .ombase import OMBase
 from ..util import setattrType, setattrOM, assertType, valueAssert, assertOM
 import xml.etree.ElementTree as ET
 
+
 class OMAttribution(OMBase):
     """Implementation of the OMAttribution object
 
@@ -35,9 +36,8 @@ class OMAttribution(OMBase):
         el.set("id", self.__dict__.get("id"))
         el.set("cdbase", self.__dict__.get("cdbase"))
         attrs = ET.Element("OMATP")
-        for (a, b) in self.attributes:
+        for a, b in self.attributes:
             attrs.append(a.toElement(), b.toElement())
         el.append(attrs)
         el.append(self.object.toElement())
         return el
-
