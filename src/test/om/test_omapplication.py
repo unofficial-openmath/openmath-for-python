@@ -11,7 +11,6 @@ class TestOMApplication(unittest.TestCase):
 
     def setUp(self):
         self.oma = OMApplication(APPLICANT, ARGUMENTS)
-        self.maxDiff = None
 
     def test_value(self):
         self.assertEqual(APPLICANT, self.oma.applicant)

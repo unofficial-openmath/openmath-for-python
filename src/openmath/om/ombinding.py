@@ -1,4 +1,5 @@
 from .ombase import OMBase
+from ..util import valueAssert
 from ..util import setattrType, setattrOM, assertOM
 import xml.etree.ElementTree as ET
 
@@ -25,15 +26,16 @@ class OMBinding(OMBase):
         setattrOM(self, "object", object_)
 
     def setBinder(self, binder):
+        # The standard doesn't specify the kind of the binder
         setattrOM(self, "binder", binder)
 
     def setVariables(self, variables):
         for v in variables:
             assertOM(v, ["OMV", "OMATTR"])
             if v.kind == "OMATTR":
-                _valueAssert(
+                valueAssert(
                     v.object.kind == "OMV",
-                    "Attributed variable binding must be a variable",
+                    "Attributed variable binding must can't use "+type(v.object).__name__,
                 )
             v.parent = self
         self.variables = tuple(variables)

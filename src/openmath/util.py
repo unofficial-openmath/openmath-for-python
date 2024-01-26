@@ -14,7 +14,9 @@ def removeNoneAttrib(elem):
 
 def assertType(x, types):
     if not isinstance(x, types):
-        raise TypeError("Expected %s, but got %s" % (" or ".join(t.__name__ for t in types), type(x).__name__))
+        istype = type(types) is type    
+        types_str = types.__name__ if istype else " or ".join(t.__name__ for t in types) 
+        raise TypeError("Expected %s, but got %s" % (types_str, type(x).__name__))
 
 
 def setattrType(obj, attr, value, types):
