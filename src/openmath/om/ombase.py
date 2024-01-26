@@ -21,18 +21,26 @@ class OMBase:
 
     def toDict(self) -> dict:
         """Get a dictionary with the attributes of the math object"""
-        d = self.__dict__
+
+        def recursiveToDict(x):
+            if OMBase._isOM(x):
+                return x.toDict()
+            elif type(x) is not str and hasattr(x, "__iter__"):
+                return [
+                    recursiveToDict(y)
+                    for y
+                    in x
+                ]
+            else:
+                return x
+
         return {
             "kind": self.kind,
             **{
-                k: d[k].toDict() 
-                    if OMBase._isOM(d[k]) 
-                    else [x.toDict() if OMBase._isOM(x) else x for x in d[k]]
-                        if type(d[k]) is not str and hasattr(d[k], "__iter__")
-                        else d[k]
-                for k 
-                in sorted(d.keys()) 
-                if d[k] is not None and k != "parent"
+                key: recursiveToDict(val)
+                for key, val
+                in vars(self).items()
+                if val is not None and key != "parent"
             },
         }
 
@@ -213,7 +221,6 @@ class OMBase:
         # The object must be OM
         if not OMBase._isOM(other):
             return False
-
         a = self.toDict()
         b = other.toDict()
         allkeys = set([*a, *b])
@@ -225,11 +232,12 @@ class OMBase:
             return False
 
         def compare(x, y):
-            """Compare a single value that may be a list"""
+            """Compare a single value that may be iterable"""
             ret = None
-            if hasattr(x, "__iter__") and hasattr(y, "__iter__"):
+            if hasattr(x, "__iter__") and hasattr(y, "__iter__") and not type(x) is str and not type(y) is str:
+                keys = x.keys() if type(x) is dict else range(len(x))
                 ret = len(x) == len(y) and all(
-                    compare(x[i], y[i]) for i in range(len(x))
+                    compare(x[i], y[i]) for i in keys
                 )
             else:
                 ret = x == y

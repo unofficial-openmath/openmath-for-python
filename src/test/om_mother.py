@@ -6,8 +6,8 @@ map = {}
 def of(kind: str, **kargs):
     return map[kind](**kargs)
 
-def genOMobject():
-    return of(choice(map.keys()))
+def _genOMobject():
+    return OMObject(of(choice(list(map.keys()))))
 
 def _genOMinteger(value=randint(-1000, 1000)):
     return OMInteger(value)
@@ -61,6 +61,7 @@ map = {
     OMVariable.kind: _genOMvariable,
     OMBinding.kind: _genOMbinding,
     OMAttribution.kind: _genOMattribution,
+    OMObject.kind: _genOMobject,
     # OMReference.kind: genOMreference,
     # OMError.kind: genOMerror,
     # OMForeign.kind: genOMforeign,
