@@ -1,15 +1,15 @@
 from openmath import *
 from random import randint, randbytes, random, choice
 
-map = {}
+_map = {}
 
 
 def of(kind: str, **kargs):
-    return map[kind](**kargs)
+    return _map[kind](**kargs)
 
 
 def _genOMobject():
-    return OMObject(of(choice(list(map.keys()))))
+    return OMObject(of(choice(list(_map.keys()))))
 
 
 def _genOMinteger(value=randint(-1000, 1000)):
@@ -71,7 +71,7 @@ def _genOMattribution(
     return OMAttribution(attributes, object_)
 
 
-map = {
+_map = {
     OMInteger.kind: _genOMinteger,
     OMString.kind: _genOMstring,
     OMFloat.kind: _genOMfloat,

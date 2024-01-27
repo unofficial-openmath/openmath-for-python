@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
-
+from typing import List
 from .. import OMSymbol
+from .symboldefinition import SymbolDefinition
 
 
 @dataclass
@@ -14,9 +15,9 @@ class ContentDictionary:
     base: str = None
     url: str = None
     comment: str = field(default=None, repr=False)
-    definitions: list = field(default_factory=list)
+    definitions: List[SymbolDefinition] = field(default_factory=list)
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: int | str | OMSymbol) -> SymbolDefinition:
         if type(key) == int:
             return self.definitions[key]
 
@@ -27,15 +28,15 @@ class ContentDictionary:
             raise KeyError(key)
 
         if isinstance(key, OMSymbol):
-            if key.getCDBase != self.cdbase or key.cd != self.name:
+            if key.getCDBase() not in (self.base, None) or key.cd != self.name:
                 raise KeyError(key)
-            return __getitem__[key.name]
+            return self.__getitem__(key.name)
 
         raise TypeError(
-            "ContentDictionary indices must be integers, strings or openmath.OMSymbol"
+            "ContentDictionary indices must be integers, strings or OMSymbols"
         )
 
-    def __contains__(self, key):
+    def __contains__(self, key: str | OMSymbol):
         if type(key) == str:
             for d in self.definitions:
                 if key == d.name:
@@ -44,7 +45,7 @@ class ContentDictionary:
 
         if isinstance(key, OMSymbol):
             return (
-                key.getCDBase() == self.base
+                (key.getCDBase() in (self.base, None))
                 and key.cd == self.name
                 and key.name in self
             )
