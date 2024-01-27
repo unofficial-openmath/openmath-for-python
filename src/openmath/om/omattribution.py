@@ -23,7 +23,7 @@ class OMAttribution(OMBase):
 
     def setAttributes(self, attrs):
         for attr in attrs:
-            assertType(attr, (tuple,list))
+            assertType(attr, (tuple, list))
             valueAssert(len(attr) == 2, "Attributes must be two values")
             assertOM(attr[0], "OMS")
             assertOM(attr[1])

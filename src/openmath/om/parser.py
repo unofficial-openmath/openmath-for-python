@@ -133,6 +133,7 @@ def fromDict(dictionary):
         case _:
             raise ValueError("A valid dictionary is required")
 
+
 def _getTag(elem):
     if elem.tag[0] == "{":
         [ns, tag] = elem.tag[1:].split("}")
