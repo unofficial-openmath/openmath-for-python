@@ -17,7 +17,7 @@ class TestOMFloat(unittest.TestCase):
         value = -1e-10
         omi = OMFloat(value)
         out = omi.toDict()
-        expected = {"kind": "OMF", "float": value}
+        expected = {"kind": "OMF", "decimal": value}
 
         self.assertDictEqual(expected, out)
 

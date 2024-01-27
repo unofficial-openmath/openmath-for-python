@@ -11,6 +11,12 @@ class OMBase:
     id = None
     parent = None
 
+    def _removeNoneAttrib(elem):
+        """Remove None attributes from XML tree"""
+        elem.attrib = {k: elem.attrib[k] for k in elem.attrib if elem.attrib[k] is not None}
+        for subelem in elem:
+            OMBase._removeNoneAttrib(subelem)
+
     def _isOM(x, kinds=None):
         if not isinstance(x, OMBase):
             return False
@@ -21,7 +27,6 @@ class OMBase:
 
     def toDict(self) -> dict:
         """Get a dictionary with the attributes of the math object"""
-
         def recursiveToDict(x):
             if OMBase._isOM(x):
                 return x.toDict()
@@ -44,7 +49,7 @@ class OMBase:
 
         All arguments are passed directly to the json.dumps function
         """
-        return json.dumps(self, default=OMBase.toDict, *args, **kwargs)
+        return json.dumps(self, default=lambda x: x.toDict(), *args, **kwargs)
 
     def toElement(self):
         """Return the object as an XML element from the xml.etree module"""
@@ -67,7 +72,7 @@ class OMBase:
         tostringkwargs = {k: kwargs[k] for k in kwargs if k in tostringaccepted}
         root = self.toElement()
         root.set("xmlns", "http://www.openmath.org/OpenMath")
-        _removeNoneAttrib(root)
+        OMBase._removeNoneAttrib(root)
         xmlstr = ET.tostring(root, *args, **tostringkwargs).decode("utf8")
 
         # Then prettify it, if necessary

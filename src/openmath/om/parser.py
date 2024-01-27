@@ -10,10 +10,12 @@ def parse(text):
 
     See parseJSON and parseXML
     """
-    if text.lstrip()[0] == "{":
-        return parseJSON(text)
-    elif text.lstrip()[0] == "<":
-        return parseXML(text)
+    text = text.lstrip()
+    if len(text) > 0:
+        if text[0] == "{":
+            return parseJSON(text)
+        elif text[0] == "<":
+            return parseXML(text)
 
     raise ValueError("Unable to detect encoding")
 
@@ -31,7 +33,10 @@ def parseXML(text):
 
     Reference: https://openmath.org/standard/om20-2019-07-01/omstd20.html#sec_xml
     """
-    return fromElement(ET.fromstring(text))
+    try:
+        return fromElement(ET.fromstring(text))
+    except ET.ParseError as e:
+        raise ValueError(f"Invalid XML - {e}")
 
 
 def fromDict(dictionary):
@@ -44,9 +49,6 @@ def fromDict(dictionary):
         case {"kind": "OMOBJ", **kwargs}:
             return OMObject(
                 fromDict(kwargs["object"]),
-                cdbase=kwargs.get("cdbase"),
-                version=kwargs.get("version"),
-                xmlns=kwargs.get("xmlns"),
                 **kwargs,
             )
 
@@ -69,7 +71,7 @@ def fromDict(dictionary):
             return OMFloat(float(x, 16), id=kwargs.get("id"))
 
         case {"kind": "OMSTR", **kwargs}:
-            return OMBytearray(kwargs["string"], id=kwargs.get("id"))
+            return OMString(kwargs["string"], id=kwargs.get("id"))
 
         case {"kind": "OMB", **kwargs}:
             return OMBytearray(kwargs["bytes"], id=kwargs.get("id"))
@@ -104,7 +106,7 @@ def fromDict(dictionary):
 
         case {"kind": "OMATTR", **kwargs}:
             recFromDict = lambda x: (
-                fromDict(x) if type(x) is not list else [recFromDict(xx) for xx in x]
+                fromDict(x) if not isinstance(x, (list,tuple,set)) else tuple(recFromDict(xx) for xx in x)
             )
             return OMAttribution(
                 recFromDict(kwargs["attributes"]),
@@ -160,11 +162,13 @@ def fromElement(elem):
         case "OMF":
             if "dec" in elem.attrib:
                 return OMFloat(float(elem.attrib["dec"]), id=elem.attrib.get("id"))
-            else:
+            elif "hex" in elem.attrib:
                 return OMFloat(
                     struct.unpack("!d", bytes.fromhex(elem.attrib["hex"])),
                     id=elem.attrib.get("id"),
                 )
+            else:
+                raise ValueError("OMF tag requires a 'dec' or 'hex' attribute")
 
         case "OMS":
             return OMSymbol(

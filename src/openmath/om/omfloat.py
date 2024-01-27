@@ -21,3 +21,8 @@ class OMFloat(OMBase):
         el.set("id", self.__dict__.get("id"))
         el.text = str(self.float)
         return el
+
+    def toDict(self) -> dict:  
+        d = {} if self.id is None else {"id": self.id}
+        d.update({"kind": self.kind, "decimal": self.float})
+        return d

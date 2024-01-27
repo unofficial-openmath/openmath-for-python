@@ -5,14 +5,6 @@ class _OMFound(BaseException):
     def __init__(self, object_):
         self.object = object_
 
-
-def removeNoneAttrib(elem):
-    """Remove None attributes from XML tree"""
-    elem.attrib = {k: elem.attrib[k] for k in elem.attrib if elem.attrib[k] is not None}
-    for subelem in elem:
-        removeNoneAttrib(subelem)
-
-
 def assertType(x, types):
     if not isinstance(x, types):
         istype = type(types) is type
