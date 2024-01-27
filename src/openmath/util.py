@@ -5,6 +5,7 @@ class _OMFound(BaseException):
     def __init__(self, object_):
         self.object = object_
 
+
 def assertType(x, types):
     if not isinstance(x, types):
         istype = type(types) is type

@@ -17,16 +17,17 @@ TEST_OMS = [
     om_mother.of("OMBIND"),
 ]
 
+
 class TestOMParser(unittest.TestCase):
 
     def test_basic_parse_errors(self):
-        self.assertRaises(ValueError, parser.parse, '')
-        self.assertRaises(ValueError, parser.parse, 'abc')
-        self.assertRaises(ValueError, parser.parse, '{}')
+        self.assertRaises(ValueError, parser.parse, "")
+        self.assertRaises(ValueError, parser.parse, "abc")
+        self.assertRaises(ValueError, parser.parse, "{}")
         self.assertRaises(ValueError, parser.parse, '{"kind": "_"}')
-        self.assertRaises(ValueError, parser.parse, '<>')
-        self.assertRaises(ValueError, parser.parse, '<NO/>')
-    
+        self.assertRaises(ValueError, parser.parse, "<>")
+        self.assertRaises(ValueError, parser.parse, "<NO/>")
+
     def test_serialization_json(self):
         for om in TEST_OMS:
             with self.subTest(om.kind):

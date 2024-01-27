@@ -13,7 +13,9 @@ class OMBase:
 
     def _removeNoneAttrib(elem):
         """Remove None attributes from XML tree"""
-        elem.attrib = {k: elem.attrib[k] for k in elem.attrib if elem.attrib[k] is not None}
+        elem.attrib = {
+            k: elem.attrib[k] for k in elem.attrib if elem.attrib[k] is not None
+        }
         for subelem in elem:
             OMBase._removeNoneAttrib(subelem)
 
@@ -27,6 +29,7 @@ class OMBase:
 
     def toDict(self) -> dict:
         """Get a dictionary with the attributes of the math object"""
+
         def recursiveToDict(x):
             if OMBase._isOM(x):
                 return x.toDict()

@@ -106,7 +106,9 @@ def fromDict(dictionary):
 
         case {"kind": "OMATTR", **kwargs}:
             recFromDict = lambda x: (
-                fromDict(x) if not isinstance(x, (list,tuple,set)) else tuple(recFromDict(xx) for xx in x)
+                fromDict(x)
+                if not isinstance(x, (list, tuple, set))
+                else tuple(recFromDict(xx) for xx in x)
             )
             return OMAttribution(
                 recFromDict(kwargs["attributes"]),
