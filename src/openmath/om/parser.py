@@ -133,6 +133,14 @@ def fromDict(dictionary):
         case _:
             raise ValueError("A valid dictionary is required")
 
+def _getTag(elem):
+    if elem.tag[0] == "{":
+        [ns, tag] = elem.tag[1:].split("}")
+    else:
+        ns = None
+        tag = elem.tag
+    return ns, tag
+
 
 def fromElement(elem):
     """Build a mathematical object from a xml.etree.Element
@@ -140,11 +148,7 @@ def fromElement(elem):
     Reference: https://openmath.org/standard/om20-2019-07-01/omstd20.html#sec_xml
     """
     # handle xml namespaces
-    if elem.tag[0] == "{":
-        [ns, tag] = elem.tag[1:].split("}")
-    else:
-        ns = None
-        tag = elem.tag
+    ns, tag = _getTag(elem)
 
     def qname(t):
         return t if ns is None else ("{%s}%s" % (ns, t))
@@ -201,10 +205,10 @@ def fromElement(elem):
             obj = None
             attrs = []
             for child in elem:
-                if child.tag == "OMATP":
-                    key = None
+                _, tag = _getTag(child)
+                if tag == "OMATP":
                     for i, x in enumerate(child):
-                        if i % 2 == 0 and key is not None:
+                        if i % 2 == 1 and key is not None:
                             attrs.append([fromElement(key), fromElement(x)])
                         else:
                             key = x
@@ -241,6 +245,5 @@ def fromElement(elem):
                 elem.attrib.get("encoding"),
                 id=elem.attrib.get("id"),
             )
-
         case _:
             raise ValueError("A valid ElementTree is required: %s" % elem)

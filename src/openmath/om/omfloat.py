@@ -19,7 +19,7 @@ class OMFloat(OMBase):
     def toElement(self):
         el = ET.Element(self.kind)
         el.set("id", self.__dict__.get("id"))
-        el.text = str(self.float)
+        el.attrib["dec"] = str(self.float)
         return el
 
     def toDict(self) -> dict:

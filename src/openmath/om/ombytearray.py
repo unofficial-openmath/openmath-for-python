@@ -21,3 +21,4 @@ class OMBytearray(OMBase):
         el = ET.Element(self.kind)
         el.set("id", self.__dict__.get("id"))
         el.text = base64.encodebytes(self.bytes).decode("ascii")
+        return el

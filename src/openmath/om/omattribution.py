@@ -23,7 +23,7 @@ class OMAttribution(OMBase):
 
     def setAttributes(self, attrs):
         for attr in attrs:
-            assertType(attr, tuple)
+            assertType(attr, (tuple,list))
             valueAssert(len(attr) == 2, "Attributes must be two values")
             assertOM(attr[0], "OMS")
             assertOM(attr[1])
@@ -37,7 +37,8 @@ class OMAttribution(OMBase):
         el.set("cdbase", self.__dict__.get("cdbase"))
         attrs = ET.Element("OMATP")
         for a, b in self.attributes:
-            attrs.append(a.toElement(), b.toElement())
+            attrs.append(a.toElement())
+            attrs.append(b.toElement())
         el.append(attrs)
         el.append(self.object.toElement())
         return el
